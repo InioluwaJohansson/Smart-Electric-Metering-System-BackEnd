@@ -1,4 +1,4 @@
-namespace Home_Security.Contracts;
+namespace Smart_Electric_Metering_System.Contracts;
 
 public interface IAuditableEntity
 {

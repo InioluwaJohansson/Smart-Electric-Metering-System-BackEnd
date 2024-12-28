@@ -1,5 +1,5 @@
-﻿using Home_Security.Contracts;
-namespace Home_Security.Entities.Identity;
+﻿using Smart_Electric_Metering_System.Contracts;
+namespace Smart_Electric_Metering_System.Entities.Identity;
 public enum Role
 {
     Owner = 1,

@@ -1,5 +1,5 @@
-﻿using Home_Security.Contracts;
-namespace Home_Security.Entities;
+﻿using Smart_Electric_Metering_System.Contracts;
+namespace Smart_Electric_Metering_System.Entities;
 public class Address: AuditableEntity
 {
     public int ContactId { get; set; }
