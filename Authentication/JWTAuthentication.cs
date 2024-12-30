@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
-using Home_Security.Models.DTOs;
+using Smart_Electric_Metering_System_BackEnd.Models.DTOs;
 using Microsoft.IdentityModel.Tokens;
-using Home_Security.Entities.Identity;
-namespace Home_Security.Authentication;
+using Smart_Electric_Metering_System_BackEnd.Entities.Identity;
+namespace Smart_Electric_Metering_System_BackEnd.Authentication;
 public class JWTAuthentication : IJWTAuthentication
 {
     public string _key;

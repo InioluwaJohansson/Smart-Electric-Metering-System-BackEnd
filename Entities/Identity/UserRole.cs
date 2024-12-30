@@ -1,6 +1,6 @@
-﻿using Home_Security.Contracts;
+﻿using Smart_Electric_Metering_System_BackEnd.Contracts;
 
-namespace Home_Security.Entities.Identity;
+namespace Smart_Electric_Metering_System_BackEnd.Entities.Identity;
 
 public class UserRole : AuditableEntity
 {

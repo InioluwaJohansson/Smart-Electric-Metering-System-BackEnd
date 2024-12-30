@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Smart_Metering_System_BackEnd.Controllers
+namespace Smart_Electric_Metering_System_BackEnd.Controllers
 {
     [ApiController]
     [Route("[controller]")]

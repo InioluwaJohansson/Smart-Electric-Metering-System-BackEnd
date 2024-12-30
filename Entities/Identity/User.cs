@@ -1,6 +1,6 @@
-﻿using Home_Security.Contracts;
-using Home_Security.Models.Enums;
-namespace Home_Security.Entities.Identity;
+﻿using Smart_Electric_Metering_System_BackEnd.Contracts;
+using Smart_Electric_Metering_System_BackEnd.Models.Enums;
+namespace Smart_Electric_Metering_System_BackEnd.Entities.Identity;
 public class User : AuditableEntity
 {
     public int PersonId { get; set; }
