@@ -1,6 +1,6 @@
-﻿using Smart_Electric_Metering_System.Contracts;
-using Smart_Electric_Metering_System.Models.Enums;
-namespace Smart_Electric_Metering_System.Entities.Identity;
+﻿using Smart_Electric_Metering_System_BackEnd.Contracts;
+using Smart_Electric_Metering_System_BackEnd.Models.Enums;
+namespace Smart_Electric_Metering_System_BackEnd.Entities.Identity;
 public class User : AuditableEntity
 {
     public int PersonId { get; set; }

@@ -1,4 +1,4 @@
-namespace Smart_Electric_Metering_System.Contracts;
+namespace Smart_Electric_Metering_System_BackEnd.Contracts;
 
 public interface ISoftDelete
 {

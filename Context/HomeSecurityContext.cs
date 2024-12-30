@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Smart_Electric_Metering_System.Entities;
-using Smart_Electric_Metering_System.Entities.Identity;
+using Smart_Electric_Metering_System_BackEnd.Entities;
+using Smart_Electric_Metering_System_BackEnd.Entities.Identity;
 
-namespace Smart_Electric_Metering_System.Context;
+namespace Smart_Electric_Metering_System_BackEnd.Context;
 
 public class HomeSecurityContext: DbContext
 {

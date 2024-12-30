@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Text;
-using Smart_Electric_Metering_System.Models.DTOs;
-namespace Smart_Electric_Metering_System.Authentication;
+using Smart_Electric_Metering_System_BackEnd.Models.DTOs;
+namespace Smart_Electric_Metering_System_BackEnd.Authentication;
 
 public interface IJWTAuthentication
 {
