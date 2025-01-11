@@ -1,4 +1,4 @@
-namespace Smart_Metering_System_BackEnd
+namespace Smart_Electric_Metering_System_BackEnd
 {
     public class WeatherForecast
     {
