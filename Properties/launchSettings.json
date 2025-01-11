@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Smart_Metering_System_BackEnd": {
+    "Smart_Electric_Metering_System_BackEnd": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
