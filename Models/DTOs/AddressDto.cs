@@ -6,7 +6,7 @@ public class CreateAddressDto
     public string City { get; set; }
     public string Region { get; set; }
     public string State { get; set; }
-    public string PostalCode { get; set; }
+    public string Country { get; set; }
 }
 public class GetAddressDto
 {
@@ -16,7 +16,7 @@ public class GetAddressDto
     public string City { get; set; }
     public string Region { get; set; }
     public string State { get; set; }
-    public string? PostalCode { get; set; }
+    public string Country { get; set; }
 }
 public class UpdateAddressDto
 {
@@ -26,5 +26,5 @@ public class UpdateAddressDto
     public string City { get; set; }
     public string Region { get; set; }
     public string State { get; set; }
-    public string PostalCode { get; set; }
+    public string Country { get; set; }
 }
