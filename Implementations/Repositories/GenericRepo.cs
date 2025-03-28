@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Smart_Electric_Metering_System_BackEnd.Context;
-using Smart_Metering_System_BackEnd.Interfaces.Repositories;
+using Smart_Electric_Metering_System_BackEnd.Interfaces.Repositories;
 using System.Linq.Expressions;
 
-namespace Smart_Metering_System_BackEnd.Implementations.Repositories;
+namespace Smart_Electric_Metering_System_BackEnd.Implementations.Repositories;
 
 public class GenericRepo<T> : IGenericRepo<T> where T : class, new()
 {

@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-namespace Smart_Metering_System_BackEnd.Interfaces.Repositories;
+namespace Smart_Electric_Metering_System_BackEnd.Interfaces.Repositories;
 public interface IGenericRepo<T>
 {
     Task<T> Create(T entity);
