@@ -11,14 +11,14 @@ public class DataService : IDataService
     IMeterRepo _meterRepo;
     IMeterUnitsRepo _meterUnitsRepo;
     IMeterUnitAllocationRepo _meterUnitAllocationRepo;
-    IUserRepo _userRepo;
+    IMeterPromptService _meterPromptService;
     IPricesRepo _pricesRepo;
-    public DataService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IUserRepo userRepo, IPricesRepo pricesRepo)
+    public DataService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IMeterPromptService meterPromptService, IPricesRepo pricesRepo)
     {
         _meterRepo = meterRepo;
         _meterUnitsRepo = meterUnitsRepo;
         _meterUnitAllocationRepo = meterUnitAllocationRepo;
-        _userRepo = userRepo;
+        _meterPromptService = meterPromptService;
         _pricesRepo = pricesRepo;
     }
     public async Task<ESP32Response> EstablishConnection(string MeterId, string auth)
@@ -140,6 +140,7 @@ public class DataService : IDataService
     public async Task<(bool,bool, double)> ResolveUnitAllocation(int meterId, double powerInkWh, CreateMeterUnitsDto createMeterUnitsDto)
     {
         var meterUnitAllocation = await _meterUnitAllocationRepo.GetByExpression(x => x.MeterId == meterId && (x.unitAllocationStatus == UnitAllocationStatus.Active || x.unitAllocationStatus == UnitAllocationStatus.Pending));
+        var meter = await _meterRepo.Get(x => x.Id == meterId);
         var engDiff = 0.00;
         if(meterUnitAllocation != null){
             meterUnitAllocation = meterUnitAllocation.OrderByDescending(x => x).ToList();
@@ -167,8 +168,24 @@ public class DataService : IDataService
                 await _meterUnitAllocationRepo.Update(meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1]);
                 return (true, true, 0);
             }
+            await CheckUnitsLeftSendPrompt(meterUnitAllocation, meter.MeterId, meter.ConnectionAuth);
             return (false, false, engDiff);
         }
         return (false, false, 0);
+    }
+    public async Task<bool> CheckUnitsLeftSendPrompt(IList<MeterUnitAllocation> meterUnitAllocations, string meterId, string connectionAuth){
+        if(meterUnitAllocations.Count() == 1){
+            if(meterUnitAllocations.First().ConsumedUnits / meterUnitAllocations.First().AllocatedUnits * 100 < 30){
+                var units = meterUnitAllocations.First().AllocatedUnits - meterUnitAllocations.First().ConsumedUnits;
+                var meterPrompt = new CreateMeterPromptDto{
+                    MeterId = meterId,
+                    ConnectionAuth = connectionAuth,
+                    Title = "Low Units Warning:",
+                    Description = $"You have only {units}kWh units left. Consider purchasing more units soon.",
+                };
+                await _meterPromptService.CreateMeterPrompt(meterPrompt);
+            }
+        }
+        return true;
     }
 }

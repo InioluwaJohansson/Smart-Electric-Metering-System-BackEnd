@@ -42,6 +42,13 @@ public class CustomerService : ICustomerService
         var NewCustomer =  new Customer {
             CustomerId = $"CUSTOMER{Guid.NewGuid().ToString().Substring(0,5).ToLower()}",
             UserId = userrole.Id,
+            Notification = new Notification{
+                PeakUsageAlerts = false,
+                UsageThresholdAlerts = false,
+                UsageAlerts = false,
+                BillingNotifications = false,
+                PushNotifications = false,
+            },
         };
         await _customerRepo.Create(NewCustomer);
         return new BaseResponse{
@@ -77,6 +84,11 @@ public class CustomerService : ICustomerService
             customer.User.FirstName = updateCustomerDto.FirstName ?? customer.User.FirstName;
             customer.User.LastName = updateCustomerDto.LastName ?? customer.User.LastName;
             customer.User.PictureUrl = imagePath ?? customer.User.PictureUrl;
+            customer.Notification.PeakUsageAlerts = updateCustomerDto.updateNotificationDto.PeakUsageAlerts;
+            customer.Notification.UsageThresholdAlerts = updateCustomerDto.updateNotificationDto.UsageThresholdAlerts;
+            customer.Notification.UsageAlerts = updateCustomerDto.updateNotificationDto.UsageAlerts;
+            customer.Notification.BillingNotifications = updateCustomerDto.updateNotificationDto.BillingNotifications;
+            customer.Notification.PushNotifications = updateCustomerDto.updateNotificationDto.PushNotifications;
             customer.LastModifiedOn = DateTime.Now;
             await _customerRepo.Update(customer);
             return new BaseResponse{
@@ -149,6 +161,13 @@ public class CustomerService : ICustomerService
                 Id = x.Id,
                 MeterId = x.MeterId
             }).ToList(),
+            getNotificationDto = new GetNotificationDto{
+                PeakUsageAlerts = customer.Notification.PeakUsageAlerts,
+                UsageThresholdAlerts = customer.Notification.UsageThresholdAlerts,
+                UsageAlerts = customer.Notification.UsageAlerts,
+                BillingNotifications = customer.Notification.BillingNotifications,
+                PushNotifications = customer.Notification.PushNotifications,
+            },
         };
     }
 }

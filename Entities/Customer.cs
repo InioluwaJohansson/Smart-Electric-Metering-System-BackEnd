@@ -6,4 +6,5 @@ public class Customer : AuditableEntity
     public string CustomerId { get; set; } = $"CUSTOMER{Guid.NewGuid().ToString().Substring(0,8)}";
     public int UserId { get; set; }
     public User User { get; set; }
+    public Notification Notification { get; set; }
 }

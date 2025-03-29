@@ -11,6 +11,7 @@ public class UpdateCustomerDto
     public string LastName { get; set; }
     public string PhoneNumber { get;set; }
     public IFormFile Picture { get; set; }
+    public UpdateNotificationDto updateNotificationDto { get; set; }
 }
 public class GetCustomerDto
 {
@@ -19,8 +20,8 @@ public class GetCustomerDto
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string UserName { get; set; }
-    public string Password { get; set; }
     public List<GetMeterDto> getMeterDto { get; set; }
+    public GetNotificationDto getNotificationDto { get; set; }
 }
 public class CustomerResponse : BaseResponse
 {

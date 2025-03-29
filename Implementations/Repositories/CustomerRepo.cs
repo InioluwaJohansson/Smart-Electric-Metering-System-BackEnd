@@ -13,6 +13,6 @@ public class CustomerRepo : GenericRepo<Customer>, ICustomerRepo
     }
     public async Task<Customer> GetById(int id)
     {
-        return await context.Customers.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == id  && x.IsDeleted == false);
+        return await context.Customers.Include(x => x.User).Include(x => x.Notification).FirstOrDefaultAsync(x => x.Id == id  && x.IsDeleted == false);
     }
 }

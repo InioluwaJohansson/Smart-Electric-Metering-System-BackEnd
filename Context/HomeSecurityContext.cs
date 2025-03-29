@@ -17,6 +17,8 @@ public class SmartElectricMeteringContext : DbContext
     public DbSet<MeterUnitAllocation> MeterUnitAllocations { get; set; }
     public DbSet<MeterUnits> MeterUnits { get; set; }
     public DbSet<Prices> Prices { get; set; }
+    public DbSet<MeterPrompt> MeterPrompts { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
