@@ -46,7 +46,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
             return Ok(meter);
         }
         [HttpGet("GetMeterById{id}")]
-        public async Task<IActionResult> GetMeterById(int id)
+        public async Task<IActionResult> GetMeterById([FromRoute]int id)
         {
             var meter = await _meterService.GetMeterById(id);
             if (meter.Status == true)

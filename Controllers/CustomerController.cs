@@ -36,7 +36,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
         }
         // GET: api/<CustomerController>
         [HttpGet("GetCustomerById{id}")]
-        public async Task<IActionResult> GetCustomerById(int id)
+        public async Task<IActionResult> GetCustomerById([FromRoute]int id)
         {
             var customer = await _customerService.GetCustomerById(id);
             if (customer.Status == true)
