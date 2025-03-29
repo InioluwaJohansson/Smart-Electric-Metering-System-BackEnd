@@ -20,7 +20,7 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
     public async Task<BaseResponse> CreateUnitAllocation(int meterId, double amount){
         var meter = await _meterRepo.Get(x => x.Id == meterId);
         var prices = await _pricesRepo.Get(x => x.Id == 1);
-        if(meter != null){
+        if(meter != null && prices != null){
             var meterUnit = new MeterUnitAllocation {
                 MeterId = meter.Id,
                 AllocatedUnits = amount,

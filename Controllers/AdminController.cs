@@ -5,7 +5,7 @@ using Smart_Electric_Metering_System_BackEnd.Models.DTOs;
 
 namespace Smart_Metering_System_BackEnd.Controllers
 {
-    [Route("SMSB/[controller]")]
+    [Route("SEMS/[controller]")]
     [ApiController]
     public class AdminController : ControllerBase
     {
