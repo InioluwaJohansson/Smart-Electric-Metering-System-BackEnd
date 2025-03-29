@@ -29,9 +29,9 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
                 BaseLoad = meter.BaseLoad / 30,
                 Transaction = new Transaction{
                     Rate = prices.Rate,
-                    BaseCharge = amount * prices.Rate,
+                    BaseCharge = prices.BaseCharge,
                     Taxes = prices.Taxes * prices.Rate * amount / 100,
-                    Total = (amount * prices.Rate) + (prices.Taxes * prices.Rate * amount / 100),
+                    Total = (amount * prices.Rate) + (prices.Taxes * prices.Rate * amount / 100) + prices.BaseCharge,
                 },
             };
             await _meterUnitAllocationRepo.Create(meterUnit);

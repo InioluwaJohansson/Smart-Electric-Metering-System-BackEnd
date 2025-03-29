@@ -67,7 +67,6 @@ public class MeterPromptService : IMeterPromptService
             };
         }
         return new MeterPromptsResponse{
-            Data = null,
             Status = false,
             Message = "Unable to retrieve data!"
         };
