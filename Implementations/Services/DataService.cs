@@ -11,19 +11,19 @@ public class DataService : IDataService
     IMeterRepo _meterRepo;
     IMeterUnitsRepo _meterUnitsRepo;
     IMeterUnitAllocationRepo _meterUnitAllocationRepo;
-    IUserRepo _userRepo;
+    IMeterPromptService _meterPromptService;
     IPricesRepo _pricesRepo;
-    public DataService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IUserRepo userRepo, IPricesRepo pricesRepo)
+    public DataService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IMeterPromptService meterPromptService, IPricesRepo pricesRepo)
     {
         _meterRepo = meterRepo;
         _meterUnitsRepo = meterUnitsRepo;
         _meterUnitAllocationRepo = meterUnitAllocationRepo;
-        _userRepo = userRepo;
+        _meterPromptService = meterPromptService;
         _pricesRepo = pricesRepo;
     }
     public async Task<ESP32Response> EstablishConnection(string MeterId, string auth)
     {
-        var meter = await _meterRepo.Get(x => x.MeterId == $"METER{MeterId}" && x.ConnectionAuth == auth);
+        var meter = await _meterRepo.Get(x => x.MeterId == MeterId && x.ConnectionAuth == auth);
         if (meter != null)
         {
             meter.IsActive = true;
@@ -64,11 +64,17 @@ public class DataService : IDataService
         };
     }
     public async Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto){
-        var meter = await _meterRepo.Get(x => x.MeterId == $"METER{createMeterUnitsDto.MeterId}");
+        var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId);
         if(meter != null && meter.TotalUnits > meter.ConsumedUnits){
-
             var powerInkWh = createMeterUnitsDto.PowerValue * 0.001 / 360;
-            meter.ConsumedUnits += powerInkWh;
+            var meterUnitAllocationResolve = await ResolveUnitAllocation(meter.Id, powerInkWh, createMeterUnitsDto);
+            if(meterUnitAllocationResolve.Item1 == true && meterUnitAllocationResolve.Item2 == true && meterUnitAllocationResolve.Item3 == 0){
+                meter.ConsumedUnits += powerInkWh;
+            }
+            else if(meterUnitAllocationResolve.Item1 == false && meterUnitAllocationResolve.Item2 == false && meterUnitAllocationResolve.Item3 > 0){
+                meter.ConsumedUnits += powerInkWh - meterUnitAllocationResolve.Item3;
+                powerInkWh -= meterUnitAllocationResolve.Item3;
+            }
             var unit = new MeterUnits () {
                 MeterId = meter.Id,
                 PowerValue = createMeterUnitsDto.PowerValue,
@@ -79,8 +85,13 @@ public class DataService : IDataService
                 ConsumptionValue = powerInkWh,
                 ElectricityCost = (await _pricesRepo.Get(x => x.Id == 1)).Rate * powerInkWh,
             };
+            if(meterUnitAllocationResolve.Item1 == false && meterUnitAllocationResolve.Item2 == false && meterUnitAllocationResolve.Item3 == 0){
+                unit = null;
+            }
             await _meterRepo.Update(meter);
-            await _meterUnitsRepo.Create(unit);
+            if(unit != null){
+                await _meterUnitsRepo.Create(unit);
+            }
             return new BaseResponse{
                 Status = true
             };
@@ -126,30 +137,55 @@ public class DataService : IDataService
             Message = "Unable to fetch Meter Units!"
         };
     }
-    public async Task<bool> ResolveUnitAllocation(int meterId, double powerInkWh, CreateMeterUnitsDto createMeterUnitsDto)
+    public async Task<(bool,bool, double)> ResolveUnitAllocation(int meterId, double powerInkWh, CreateMeterUnitsDto createMeterUnitsDto)
     {
         var meterUnitAllocation = await _meterUnitAllocationRepo.GetByExpression(x => x.MeterId == meterId && (x.unitAllocationStatus == UnitAllocationStatus.Active || x.unitAllocationStatus == UnitAllocationStatus.Pending));
+        var meter = await _meterRepo.Get(x => x.Id == meterId);
         var engDiff = 0.00;
         if(meterUnitAllocation != null){
-            meterUnitAllocation = meterUnitAllocation.OrderByDescending(x => x.CreatedOn).ToList();
-            if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
-                meterUnitAllocation.First().PeakLoad += powerInkWh;
-            }
+            meterUnitAllocation = meterUnitAllocation.OrderByDescending(x => x).ToList();
             if(meterUnitAllocation.First().AllocatedUnits < meterUnitAllocation.First().ConsumedUnits){
                 engDiff = meterUnitAllocation.First().ConsumedUnits - meterUnitAllocation.First().AllocatedUnits;
                 meterUnitAllocation.First().ConsumedUnits -= engDiff;
                 meterUnitAllocation.First().unitAllocationStatus = UnitAllocationStatus.Inactive;
+                if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
+                    meterUnitAllocation.First().PeakLoad += powerInkWh - engDiff;
+                }else{
+                    meterUnitAllocation.First().OffPeakLoad += powerInkWh - engDiff;
+                }
                 await _meterUnitAllocationRepo.Update(meterUnitAllocation.First());
-                return true;
+                return (true, true, 0);
             }
-            if(meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1] != null && meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus == UnitAllocationStatus.Pending && meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].ConsumedUnits == 0){
+            else if(meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1] != null && meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus == UnitAllocationStatus.Pending && meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].ConsumedUnits == 0){
                 meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].ConsumedUnits += engDiff;
                 meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus = UnitAllocationStatus.Active;
+                if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
+                    meterUnitAllocation.First().PeakLoad += engDiff;
+                }else{
+                    meterUnitAllocation.First().OffPeakLoad += engDiff;
+                }
+                await _meterUnitAllocationRepo.Update(meterUnitAllocation.First());
                 await _meterUnitAllocationRepo.Update(meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1]);
-                return true;
+                return (true, true, 0);
             }
-            return true;
+            await CheckUnitsLeftSendPrompt(meterUnitAllocation, meter.MeterId, meter.ConnectionAuth);
+            return (false, false, engDiff);
         }
-        return false;
+        return (false, false, 0);
+    }
+    public async Task<bool> CheckUnitsLeftSendPrompt(IList<MeterUnitAllocation> meterUnitAllocations, string meterId, string connectionAuth){
+        if(meterUnitAllocations.Count() == 1){
+            if(meterUnitAllocations.First().ConsumedUnits / meterUnitAllocations.First().AllocatedUnits * 100 < 30){
+                var units = meterUnitAllocations.First().AllocatedUnits - meterUnitAllocations.First().ConsumedUnits;
+                var meterPrompt = new CreateMeterPromptDto{
+                    MeterId = meterId,
+                    ConnectionAuth = connectionAuth,
+                    Title = "Low Units Warning:",
+                    Description = $"You have only {units}kWh units left. Consider purchasing more units soon.",
+                };
+                await _meterPromptService.CreateMeterPrompt(meterPrompt);
+            }
+        }
+        return true;
     }
 }

@@ -20,7 +20,7 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
     public async Task<BaseResponse> CreateUnitAllocation(int meterId, double amount){
         var meter = await _meterRepo.Get(x => x.Id == meterId);
         var prices = await _pricesRepo.Get(x => x.Id == 1);
-        if(meter != null){
+        if(meter != null && prices != null){
             var meterUnit = new MeterUnitAllocation {
                 MeterId = meter.Id,
                 AllocatedUnits = amount,
@@ -29,9 +29,9 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
                 BaseLoad = meter.BaseLoad / 30,
                 Transaction = new Transaction{
                     Rate = prices.Rate,
-                    BaseCharge = amount * prices.Rate,
+                    BaseCharge = prices.BaseCharge,
                     Taxes = prices.Taxes * prices.Rate * amount / 100,
-                    Total = (amount * prices.Rate) + (prices.Taxes * prices.Rate * amount / 100),
+                    Total = (amount * prices.Rate) + (prices.Taxes * prices.Rate * amount / 100) + prices.BaseCharge,
                 },
             };
             await _meterUnitAllocationRepo.Create(meterUnit);

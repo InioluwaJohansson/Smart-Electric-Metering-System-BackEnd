@@ -9,14 +9,10 @@ namespace Smart_Electric_Metering_System_BackEnd.Implementations.Services;
 public class MeterService : IMeterService
 {
     IMeterRepo _meterRepo;
-    IMeterUnitsRepo _meterUnitsRepo;
-    IMeterUnitAllocationRepo _meterUnitAllocationRepo;
     IUserRepo _userRepo;
-    public MeterService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IUserRepo userRepo)
+    public MeterService(IMeterRepo meterRepo, IUserRepo userRepo)
     {
         _meterRepo = meterRepo;
-        _meterUnitsRepo = meterUnitsRepo;
-        _meterUnitAllocationRepo = meterUnitAllocationRepo;
         _userRepo = userRepo;
     }
     public async Task<BaseResponse> CreateMeter(CreateMeterDto createMeterDto)
@@ -58,7 +54,7 @@ public class MeterService : IMeterService
         var user = await _userRepo.Get(x => x.Id == attachMeterDto.UserId);
         if (user != null)
         {
-            var meter = await _meterRepo.Get(x => x.MeterId == $"METER{attachMeterDto.MeterId}" && x.MeterKey == attachMeterDto.MeterKey);
+            var meter = await _meterRepo.Get(x => x.MeterId == attachMeterDto.MeterId && x.MeterKey == attachMeterDto.MeterKey);
             if (meter != null && meter.UserId == 0)
             {
                 meter.UserId = user.Id;
