@@ -58,7 +58,7 @@ public class MeterService : IMeterService
         var user = await _userRepo.Get(x => x.Id == attachMeterDto.UserId);
         if (user != null)
         {
-            var meter = await _meterRepo.Get(x => x.MeterId == $"METER{attachMeterDto.MeterId}" && x.MeterKey == attachMeterDto.MeterKey);
+            var meter = await _meterRepo.Get(x => x.MeterId == attachMeterDto.MeterId && x.MeterKey == attachMeterDto.MeterKey);
             if (meter != null && meter.UserId == 0)
             {
                 meter.UserId = user.Id;

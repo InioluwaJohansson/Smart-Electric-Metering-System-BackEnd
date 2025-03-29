@@ -23,7 +23,7 @@ public class DataService : IDataService
     }
     public async Task<ESP32Response> EstablishConnection(string MeterId, string auth)
     {
-        var meter = await _meterRepo.Get(x => x.MeterId == $"METER{MeterId}" && x.ConnectionAuth == auth);
+        var meter = await _meterRepo.Get(x => x.MeterId == MeterId && x.ConnectionAuth == auth);
         if (meter != null)
         {
             meter.IsActive = true;
@@ -64,7 +64,7 @@ public class DataService : IDataService
         };
     }
     public async Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto){
-        var meter = await _meterRepo.Get(x => x.MeterId == $"METER{createMeterUnitsDto.MeterId}");
+        var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId);
         if(meter != null && meter.TotalUnits > meter.ConsumedUnits){
             var powerInkWh = createMeterUnitsDto.PowerValue * 0.001 / 360;
             var meterUnitAllocationResolve = await ResolveUnitAllocation(meter.Id, powerInkWh, createMeterUnitsDto);
