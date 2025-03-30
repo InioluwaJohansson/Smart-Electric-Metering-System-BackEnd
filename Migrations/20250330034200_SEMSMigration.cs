@@ -57,6 +57,7 @@ namespace Smart_Metering_System_BackEnd.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     IsDismissed = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),

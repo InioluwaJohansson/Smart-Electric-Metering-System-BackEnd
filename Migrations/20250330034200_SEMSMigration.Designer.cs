@@ -11,7 +11,7 @@ using Smart_Electric_Metering_System_BackEnd.Context;
 namespace Smart_Metering_System_BackEnd.Migrations
 {
     [DbContext(typeof(SmartElectricMeteringContext))]
-    [Migration("20250329172433_SEMSMigration")]
+    [Migration("20250330034200_SEMSMigration")]
     partial class SEMSMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -371,6 +371,9 @@ namespace Smart_Metering_System_BackEnd.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
