@@ -36,7 +36,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
         }
         // GET: api/<DataController>
         [HttpGet("MeterUnitsData{id}")]
-        public async Task<IActionResult> MeterUnitsData(int id)
+        public async Task<IActionResult> MeterUnitsData([FromRoute]int id)
         {
             var data = await _dataService.MeterUnitsData(id);
             if (data.Status == true)

@@ -36,7 +36,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
         }
         // GET: api/<AdminController>
         [HttpGet("GetAdminById{id}")]
-        public async Task<IActionResult> GetAdminById(int id)
+        public async Task<IActionResult> GetAdminById([FromRoute]int id)
         {
             var admin = await _adminService.GetAdminById(id);
             if (admin.Status == true)
@@ -56,7 +56,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
             return Ok(admin);
         }
         [HttpPut("DeleteAdmin{id}")]
-        public async Task<IActionResult> DeleteAdmin(int id)
+        public async Task<IActionResult> DeleteAdmin([FromRoute]int id)
         {
             var admin = await _adminService.DeleteAdmin(id);
             if (admin.Status == true)

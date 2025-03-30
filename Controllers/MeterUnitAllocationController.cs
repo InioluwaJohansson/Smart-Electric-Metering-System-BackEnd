@@ -26,7 +26,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
         }
         // GET: api/<MeterUnitAllocationController>
         [HttpGet("GetMeterUnitAllocationById{id}")]
-        public async Task<IActionResult> GetMeterUnitAllocationById(int meterId)
+        public async Task<IActionResult> GetMeterUnitAllocationById([FromRoute]int meterId)
         {
             var meterunitallocation = await _meterunitallocationService.GetMeterUnitsAllocation(meterId);
             if (meterunitallocation.Status == true)

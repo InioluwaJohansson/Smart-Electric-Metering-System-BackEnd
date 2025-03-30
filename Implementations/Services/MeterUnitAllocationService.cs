@@ -11,11 +11,13 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
     IMeterRepo _meterRepo;
     IMeterUnitAllocationRepo _meterUnitAllocationRepo;
     IPricesRepo _pricesRepo;
-    public MeterUnitAllocationService(IMeterRepo meterRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IPricesRepo pricesRepo)
+    IMeterPromptService _meterPromptService;
+    public MeterUnitAllocationService(IMeterRepo meterRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IPricesRepo pricesRepo, IMeterPromptService meterPromptService)
     {
         _meterRepo = meterRepo;
         _meterUnitAllocationRepo = meterUnitAllocationRepo;
         _pricesRepo = pricesRepo;
+        _meterPromptService = meterPromptService;
     }
     public async Task<BaseResponse> CreateUnitAllocation(int meterId, double amount){
         var meter = await _meterRepo.Get(x => x.Id == meterId);
@@ -37,6 +39,14 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
             await _meterUnitAllocationRepo.Create(meterUnit);
             meter.TotalUnits += amount;
             await _meterRepo.Update(meter);
+            var meterPrompt = new CreateMeterPromptDto{
+                MeterId = meter.MeterId,
+                ConnectionAuth = meter.ConnectionAuth,
+                Title = "Bill Payment Successful",
+                Description = $"Your payment of #{meterUnit.Transaction.Total} was successfully processed.",
+                Type = MeterPromptType.PaymentSuccessful
+            };
+            await _meterPromptService.CreateMeterPrompt(meterPrompt);
             return new BaseResponse{
                 Status = true,
                 Message = "Meter Allocation Successful!"

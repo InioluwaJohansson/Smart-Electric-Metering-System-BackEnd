@@ -370,6 +370,9 @@ namespace Smart_Metering_System_BackEnd.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("MeterPrompts");

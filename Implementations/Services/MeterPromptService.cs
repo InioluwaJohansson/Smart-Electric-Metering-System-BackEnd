@@ -24,6 +24,7 @@ public class MeterPromptService : IMeterPromptService
                 MeterId = meter.Id,
                 Title = createMeterPromptDto.Title,
                 Description = createMeterPromptDto.Description,
+                Type = createMeterPromptDto.Type,
                 Date = DateTime.Now,
                 IsDismissed = false,
             };
@@ -58,7 +59,7 @@ public class MeterPromptService : IMeterPromptService
         };
     }
     public async Task<MeterPromptsResponse> GetMeterPrompts(int meterId){
-        var meterPrompts = await _meterPromptRepo.GetByExpression(x => x.MeterId == meterId);
+        var meterPrompts = await _meterPromptRepo.GetByExpression(x => x.MeterId == meterId && x.IsDismissed == false);
         if(meterPrompts != null){
             return new MeterPromptsResponse{
                 Data = meterPrompts.Select(x => GetMeterPromptDto(x)).ToList(),
@@ -78,6 +79,7 @@ public class MeterPromptService : IMeterPromptService
             Title = meterPrompt.Title,
             Description = meterPrompt.Description,
             Date = meterPrompt.Date,
+            Type = meterPrompt.Type,
             IsDismissed = meterPrompt.IsDismissed,
         };
     }
