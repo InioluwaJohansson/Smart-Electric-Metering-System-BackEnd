@@ -182,6 +182,7 @@ public class DataService : IDataService
                     ConnectionAuth = connectionAuth,
                     Title = "Low Units Warning:",
                     Description = $"You have only {units}kWh units left. Consider purchasing more units soon.",
+                    Type = MeterPromptType.UnitCritical
                 };
                 await _meterPromptService.CreateMeterPrompt(meterPrompt);
             }

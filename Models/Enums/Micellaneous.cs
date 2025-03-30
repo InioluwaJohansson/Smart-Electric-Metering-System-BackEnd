@@ -5,3 +5,8 @@ public enum UnitAllocationStatus
     Active,
     Inactive,
 }
+public enum MeterPromptType{
+    PaymentSuccessful = 1,
+    UnitCritical,
+    VoltageOverload,
+}

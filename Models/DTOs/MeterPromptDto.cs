@@ -1,3 +1,5 @@
+using Smart_Metering_System_BackEnd.Models.Enums;
+
 namespace Smart_Electric_Metering_System_BackEnd.Models.DTOs;
 
 public class CreateMeterPromptDto
@@ -6,6 +8,7 @@ public class CreateMeterPromptDto
     public string ConnectionAuth { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
+    public MeterPromptType Type { get; set; }
     public bool IsDismissed { get; set; }
 }
 public class GetMeterPromptDto
@@ -15,6 +18,7 @@ public class GetMeterPromptDto
     public string Title { get; set; }
     public string Description { get; set; }
     public DateTime Date { get; set; }
+    public MeterPromptType Type { get; set; }
     public bool IsDismissed { get; set; }
 }
 public class MeterPromptResponse : BaseResponse
