@@ -3,7 +3,7 @@
 
 ## Overview
 
-The Smart Electric Metering System Backend is designed to log and optimize power usage, specifically tailored for the Nigerian consumer power sector. Developed by Makinde T.I, Makinde K.E, Abu A.O, and Adenekan A.A, this backend system serves as the core component for managing and analyzing electricity consumption data.
+The Smart Electric Metering System Backend is designed to log and optimize power usage, specifically tailored for the Nigerian consumer power sector. Developed by Makinde T.I, Abu A.O, and Adenekan A.A, this backend system serves as the core component for managing and analyzing electricity consumption data.
 
 ## Features
 
