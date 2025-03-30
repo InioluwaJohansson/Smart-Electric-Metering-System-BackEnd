@@ -64,7 +64,7 @@ public class DataService : IDataService
         };
     }
     public async Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto){
-        var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId);
+        var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId && x.ConnectionAuth == createMeterUnitsDto.ConnectionAuth);
         if(meter != null && meter.TotalUnits > meter.ConsumedUnits){
             var powerInkWh = createMeterUnitsDto.PowerValue * 0.001 / 360;
             var meterUnitAllocationResolve = await ResolveUnitAllocation(meter.Id, powerInkWh, createMeterUnitsDto);
@@ -88,9 +88,19 @@ public class DataService : IDataService
             if(meterUnitAllocationResolve.Item1 == false && meterUnitAllocationResolve.Item2 == false && meterUnitAllocationResolve.Item3 == 0){
                 unit = null;
             }
-            await _meterRepo.Update(meter);
             if(unit != null){
                 await _meterUnitsRepo.Create(unit);
+            }
+            await _meterRepo.Update(meter);
+            if(createMeterUnitsDto.Status == false){
+                var meterPrompt = new CreateMeterPromptDto{
+                    MeterId = meter.MeterId,
+                    ConnectionAuth = meter.ConnectionAuth,
+                    Title = "High Voltage Warning",
+                    Description = $"The meter recorded voltages above the maximum operating limit.",
+                    Type = MeterPromptType.VoltageOverload
+                };
+                await _meterPromptService.CreateMeterPrompt(meterPrompt);
             }
             return new BaseResponse{
                 Status = true
@@ -180,7 +190,7 @@ public class DataService : IDataService
                 var meterPrompt = new CreateMeterPromptDto{
                     MeterId = meterId,
                     ConnectionAuth = connectionAuth,
-                    Title = "Low Units Warning:",
+                    Title = "Low Units Warning",
                     Description = $"You have only {units}kWh units left. Consider purchasing more units soon.",
                     Type = MeterPromptType.UnitCritical
                 };

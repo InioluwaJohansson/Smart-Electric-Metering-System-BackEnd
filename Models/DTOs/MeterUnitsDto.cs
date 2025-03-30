@@ -3,11 +3,14 @@
 public class CreateMeterUnitsDto
 {
     public string MeterId { get; set; }
+    public string ConnectionAuth { get; set; }
     public double PowerValue { get; set; }
     public double VoltageValue { get; set; }
     public double CurrentValue { get; set; }
     public double PowerFactorValue { get; set; }
     public DateTime TimeValue { get; set; }
+    public bool Status { get; set; }
+
 }
 public class GetMeterUnitsDto
 {

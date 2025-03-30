@@ -157,6 +157,9 @@ public class CustomerService : ICustomerService
             FirstName = user.FirstName,
             LastName = user.LastName,
             UserName = user.UserName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            PictureUrl = user.PictureUrl,
             getMeterDto = meters.Select(x => new GetMeterDto{
                 Id = x.Id,
                 MeterId = x.MeterId
