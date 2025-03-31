@@ -43,9 +43,9 @@ public class DataService : IDataService
             Message = "Unable to establish Connection. Invalid Authentication Details!"
         };
     }
-    public async Task<ESP32Response> MeterDataToESP32(string MeterId, string auth)
+    /* public async Task<ESP32Response> MeterDataToESP32(string MeterId, string auth)
     {
-        var meter = await _meterRepo.Get(x => x.MeterId == $"METER{MeterId}" && x.ConnectionAuth == auth);
+        var meter = await _meterRepo.Get(x => x.MeterId == MeterId && x.ConnectionAuth == auth);
         if(meter != null)
         {
             return new ESP32Response
@@ -62,7 +62,7 @@ public class DataService : IDataService
             Status = false,
             Message = "Unable to send Data to ESP32"
         };
-    }
+    }*/
     public async Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto){
         var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId && x.ConnectionAuth == createMeterUnitsDto.ConnectionAuth);
         if(meter != null && meter.TotalUnits > meter.ConsumedUnits){
@@ -97,7 +97,7 @@ public class DataService : IDataService
                     MeterId = meter.MeterId,
                     ConnectionAuth = meter.ConnectionAuth,
                     Title = "High Voltage Warning",
-                    Description = $"The meter recorded voltages above the maximum operating limit.",
+                    Description = $"The meter recorded voltages above the maximum operating limit. The meter will reconnect momentarily.",
                     Type = MeterPromptType.VoltageOverload
                 };
                 await _meterPromptService.CreateMeterPrompt(meterPrompt);
@@ -120,7 +120,7 @@ public class DataService : IDataService
     }
     public async Task<MeterUnitsResponse> MeterUnitsData(int id)
     {
-        var meterUnits = await _meterUnitsRepo.GetByExpression(x => x.Id == id);
+        var meterUnits = await _meterUnitsRepo.GetByExpression(x => x.MeterId == id);
         if(meterUnits != null){
             return new MeterUnitsResponse
             {

@@ -10,9 +10,19 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class PricesController : ControllerBase
     {
         IPricesService _pricesService;
-        PricesController(IPricesService pricesService)
+        public PricesController(IPricesService pricesService)
         {
             _pricesService = pricesService;
+        }
+        [HttpPost("CreatePrices")]
+        public async Task<IActionResult> CreatePrices([FromBody] CreatePricesDto createPricesDto)
+        {
+            var prices = await _pricesService.CreatePrices(createPricesDto);
+            if (prices.Status == true)
+            {
+                return Ok(prices);
+            }
+            return Ok(prices);
         }
         [HttpPut("UpdatePrices")]
         public async Task<IActionResult> UpdatePrices([FromBody] UpdatePricesDto updatePricesDto)

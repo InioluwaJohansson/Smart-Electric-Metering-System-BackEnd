@@ -13,7 +13,11 @@ public class AdminRepo : GenericRepo<Admin>, IAdminRepo
     }
     public async Task<Admin> GetById(int id)
     {
-        return await context.Admins.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == id  && x.IsDeleted == false);
+        return await context.Admins.Include(x => x.User).FirstOrDefaultAsync(x => x.User.Id == id  && x.IsDeleted == false);
+    }
+    public async Task<IList<Admin>> GetAdmins()
+    {
+        return await context.Admins.Include(x => x.User).Where(x => x.IsDeleted == false).ToListAsync();
     }
 }
 

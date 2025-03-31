@@ -10,7 +10,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class CustomerController : ControllerBase
     {
         ICustomerService _customerService;
-        CustomerController(ICustomerService customerService)
+        public CustomerController(ICustomerService customerService)
         {
             _customerService = customerService;
         }

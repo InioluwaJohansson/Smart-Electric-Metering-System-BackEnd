@@ -30,6 +30,7 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
                 unitAllocationStatus = UnitAllocationStatus.Pending,
                 BaseLoad = meter.BaseLoad / 30,
                 Transaction = new Transaction{
+                    TransactionId = Guid.NewGuid().ToString().Substring(0,16).Replace("-", "").ToUpper(),
                     Rate = prices.Rate,
                     BaseCharge = prices.BaseCharge,
                     Taxes = prices.Taxes * prices.Rate * amount / 100,

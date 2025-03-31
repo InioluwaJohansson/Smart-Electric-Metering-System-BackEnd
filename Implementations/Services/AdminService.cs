@@ -16,7 +16,7 @@ public class AdminService : IAdminService
     }
     public async Task<BaseResponse> CreateAdmin(CreateAdminDto createAdminDto)
     {
-        var Admin = await _userRepo.Get(x => x.UserName == createAdminDto.createUserDto.UserName);
+        var Admin = await _userRepo.Get(x => x.UserName == createAdminDto.createUserDto.Email);
         if(Admin != null)
         {
             return new BaseResponse{
@@ -27,7 +27,10 @@ public class AdminService : IAdminService
         var user = new User{
             FirstName = createAdminDto.createUserDto.FirstName,
             LastName = createAdminDto.createUserDto.LastName,
-            UserName = createAdminDto.createUserDto.UserName,
+            Email = createAdminDto.createUserDto.Email,
+            UserName = "",
+            PhoneNumber = "",
+            PictureUrl = "",
             Password = BCrypt.Net.BCrypt.HashPassword(createAdminDto.createUserDto.Password),
         };
         var userrole = await _userRepo.Create(user);
@@ -38,7 +41,7 @@ public class AdminService : IAdminService
         userrole.UserRole = userRole;
         await _userRepo.Update(userrole);
         var NewAdmin =  new Admin {
-            AdminId = $"Admin{Guid.NewGuid().ToString().Substring(0,5).ToLower()}",
+            AdminId = $"ADMIN{Guid.NewGuid().ToString().Substring(0, 8).Replace("-", "").ToUpper()}",
             UserId = userrole.Id,
         };
         await _adminRepo.Create(NewAdmin);
@@ -74,6 +77,9 @@ public class AdminService : IAdminService
             }
             admin.User.FirstName = updateAdminDto.FirstName ?? admin.User.FirstName;
             admin.User.LastName = updateAdminDto.LastName ?? admin.User.LastName;
+            admin.User.UserName = updateAdminDto.UserName ?? admin.User.UserName;
+            admin.User.Email = updateAdminDto.Email ?? admin.User.Email;
+            admin.User.PhoneNumber = updateAdminDto.PhoneNumber ?? admin.User.PhoneNumber;
             admin.User.PictureUrl = imagePath ?? admin.User.PictureUrl;
             admin.LastModifiedOn = DateTime.Now;
             await _adminRepo.Update(admin);
@@ -88,7 +94,7 @@ public class AdminService : IAdminService
         };
     }
     public async Task<AdminResponse> GetAdminById(int id){
-        var Admin = await _adminRepo.Get(c => c.Id == id);
+        var Admin = await _adminRepo.GetById(id);
         if (Admin == null)
         {
             return new AdminResponse
@@ -114,10 +120,15 @@ public class AdminService : IAdminService
         };
     }
     public async Task<AdminsResponse> GetAllAdmins(){
-        var admin = await _adminRepo.GetByExpression(x => x.IsDeleted == false);
+        var admin = await _adminRepo.GetAdmins();
         if(admin != null){
+            List<GetAdminDto> adminList = new List<GetAdminDto>();
+            foreach (var item in admin)
+            {
+                adminList.Add(await GetAdminDetails(item));
+            }
             return new AdminsResponse{
-                Data = (ICollection<GetAdminDto>)admin.Select(x => GetAdminDetails(x)).ToList(),
+                Data = adminList,
                 Status =  true,
                 Message = "admins Data Retrieved!"
             };
@@ -130,18 +141,16 @@ public class AdminService : IAdminService
     }
     public async Task<GetAdminDto> GetAdminDetails(Admin Admin)
     {
-        var user = await _userRepo.Get(u => u.Id == Admin.UserId);
-        if (user == null)
-        {
-            return null;
-        }
         return new GetAdminDto
         {
             Id = Admin.Id,
             AdminId = Admin.AdminId,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            UserName = user.UserName
+            FirstName = Admin.User.FirstName,
+            LastName = Admin.User.LastName,
+            UserName = Admin.User.UserName,
+            Email = Admin.User.Email,
+            PhoneNumber = Admin.User.PhoneNumber,
+            PictureUrl = Admin.User.PictureUrl,
         };
     }
     public async Task<BaseResponse> DeleteAdmin(int id){

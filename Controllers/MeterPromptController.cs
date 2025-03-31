@@ -10,19 +10,9 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class MeterPromptController : ControllerBase
     {
         IMeterPromptService _meterpromptService;
-        MeterPromptController(IMeterPromptService meterpromptService)
+        public MeterPromptController(IMeterPromptService meterpromptService)
         {
             _meterpromptService = meterpromptService;
-        }
-        [HttpPost("CreateMeterPrompt")]
-        public async Task<IActionResult> CreateMeterPrompt(CreateMeterPromptDto createMeterPromptDto)
-        {
-            var meterprompt = await _meterpromptService.CreateMeterPrompt(createMeterPromptDto);
-            if (meterprompt.Status == true)
-            {
-                return Ok(meterprompt);
-            }
-            return Ok(meterprompt);
         }
         [HttpPut("UpdateMeterPrompts")]
         public async Task<IActionResult> UpdateMeterPrompts(int meterId)

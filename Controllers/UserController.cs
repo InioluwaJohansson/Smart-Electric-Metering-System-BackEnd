@@ -10,9 +10,19 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class UserController : ControllerBase
     {
         IUserService _userService;
-        UserController(IUserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
+        }
+        [HttpGet("CheckUserName")]
+        public async Task<IActionResult> CheckUserName(string username)
+        {
+            var user = await _userService.CheckUserName(username);
+            if (user == true)
+            {
+                return Ok(user);
+            }
+            return Ok(user);
         }
         [HttpPost("Login")]
         public async Task<IActionResult> Login(string username, string password)

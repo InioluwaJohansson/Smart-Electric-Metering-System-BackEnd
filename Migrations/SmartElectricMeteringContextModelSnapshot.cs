@@ -205,6 +205,10 @@ namespace Smart_Metering_System_BackEnd.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("PictureUrl")
                         .IsRequired()
                         .HasColumnType("longtext");

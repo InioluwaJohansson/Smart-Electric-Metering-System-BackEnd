@@ -24,7 +24,7 @@ public class MeterService : IMeterService
                 IsActive = false,
                 CreatedBy = createMeterDto.AdminUserId,
                 LastModifiedBy = createMeterDto.AdminUserId,
-                MeterKey = Guid.NewGuid().ToString().Substring(0,9),
+                MeterKey = $"METER{Guid.NewGuid().ToString().Substring(0,8).Replace("-", "").ToUpper()}",
                 IsDeleted = false,
                 UserId = 0,
                 MeterAddress = new Address{
@@ -58,13 +58,6 @@ public class MeterService : IMeterService
             if (meter != null && meter.UserId == 0)
             {
                 meter.UserId = user.Id;
-                meter.BaseLoad = attachMeterDto.BaseLoad;
-                meter.MeterAddress.Country = attachMeterDto.createAddressDto.Country ?? meter.MeterAddress.Country;
-                meter.MeterAddress.State = attachMeterDto.createAddressDto.State ?? meter.MeterAddress.State;
-                meter.MeterAddress.Region = attachMeterDto.createAddressDto.Region ?? meter.MeterAddress.Region;
-                meter.MeterAddress.City = attachMeterDto.createAddressDto.City ?? meter.MeterAddress.City;
-                meter.MeterAddress.Street = attachMeterDto.createAddressDto.Street ?? meter.MeterAddress.Street;
-                meter.MeterAddress.NumberLine = attachMeterDto.createAddressDto.NumberLine ?? meter.MeterAddress.NumberLine;
                 await _meterRepo.Update(meter);
                 return new BaseResponse
                 {
@@ -82,6 +75,41 @@ public class MeterService : IMeterService
         {
             Status = false,
             Message = "Error attaching Meter to Customer!"
+        };
+    }
+    public async Task<BaseResponse> UpdateMeter(UpdateMeterDto attachMeterDto)
+    {
+        var user = await _userRepo.Get(x => x.Id == attachMeterDto.UserId);
+        if (user != null)
+        {
+            var meter = await _meterRepo.Get(x => x.MeterId == attachMeterDto.MeterId && x.MeterKey == attachMeterDto.MeterKey);
+            if (meter != null && meter.UserId == 0)
+            {
+                meter.BaseLoad = attachMeterDto.BaseLoad;
+                meter.IsActive = attachMeterDto.IsActive;
+                meter.MeterAddress.Country = attachMeterDto.createAddressDto.Country ?? meter.MeterAddress.Country;
+                meter.MeterAddress.State = attachMeterDto.createAddressDto.State ?? meter.MeterAddress.State;
+                meter.MeterAddress.Region = attachMeterDto.createAddressDto.Region ?? meter.MeterAddress.Region;
+                meter.MeterAddress.City = attachMeterDto.createAddressDto.City ?? meter.MeterAddress.City;
+                meter.MeterAddress.Street = attachMeterDto.createAddressDto.Street ?? meter.MeterAddress.Street;
+                meter.MeterAddress.NumberLine = attachMeterDto.createAddressDto.NumberLine ?? meter.MeterAddress.NumberLine;
+                await _meterRepo.Update(meter);
+                return new BaseResponse
+                {
+                    Status = true,
+                    Message = "Meter Information Updated!"
+                };
+            }
+            return new BaseResponse
+            {
+                Status = false,
+                Message = "Meter not found!"
+            };
+        }
+        return new BaseResponse
+        {
+            Status = false,
+            Message = "Error Finding User!"
         };
     }
     public async Task<BaseResponse> AllocateMeterUnit(CreateMeterUnitAllocationDto createMeterUnitAllocationDto)
@@ -144,11 +172,13 @@ public class MeterService : IMeterService
         var meters = await _meterRepo.GetAllMeters();
         if (meters != null)
         {
+            List<GetMeterDto> meterList = new List<GetMeterDto>();
+            foreach (var item in meters) meterList.Add(await GetMeterDto(item));
             return new MetersResponse
             {
                 Status = true,
                 Message = "Meters Found!",
-                Data = (ICollection<GetMeterDto>)meters.Select(x => GetMeterDto(x)).ToList(),
+                Data = meterList,
             };
         }
         return new MetersResponse

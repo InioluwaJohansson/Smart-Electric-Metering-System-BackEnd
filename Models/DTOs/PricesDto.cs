@@ -1,5 +1,11 @@
 namespace Smart_Electric_Metering_System_BackEnd.Models.DTOs;
-
+public class CreatePricesDto
+{
+    public string ItemName { get; set; }
+    public double Rate { get; set; }
+    public double Taxes { get; set; }
+    public double BaseCharge { get; set; }
+}
 public class UpdatePricesDto
 {
     public int Id { get; set; }
