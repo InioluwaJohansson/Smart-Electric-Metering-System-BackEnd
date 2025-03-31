@@ -43,26 +43,6 @@ public class DataService : IDataService
             Message = "Unable to establish Connection. Invalid Authentication Details!"
         };
     }
-    /* public async Task<ESP32Response> MeterDataToESP32(string MeterId, string auth)
-    {
-        var meter = await _meterRepo.Get(x => x.MeterId == MeterId && x.ConnectionAuth == auth);
-        if(meter != null)
-        {
-            return new ESP32Response
-            {
-                IsActive = meter.IsActive,
-                ActiveLoad = meter.ActiveLoad,
-                TotalUnits = meter.TotalUnits,
-                ConsumedUnits = meter.ConsumedUnits,
-                Status = true
-            };
-        }
-        return new ESP32Response
-        {
-            Status = false,
-            Message = "Unable to send Data to ESP32"
-        };
-    }*/
     public async Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto){
         var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId && x.ConnectionAuth == createMeterUnitsDto.ConnectionAuth);
         if(meter != null && meter.TotalUnits > meter.ConsumedUnits){
@@ -198,5 +178,17 @@ public class DataService : IDataService
             }
         }
         return true;
+    }
+    public async Task CheckConnection(){
+        var meters = await _meterRepo.GetByExpression(x => x.IsActive == true);
+        if(meters != null){
+            foreach(var meter in meters){
+                var meterUnit = await _meterUnitsRepo.GetByExpression(x => x.MeterId == meter.Id);
+                if(DateTime.Now > meterUnit.Last().TimeValue.AddMinutes(-2)){
+                    meter.IsActive = false;
+                    await _meterRepo.Update(meter);
+                }
+            }
+        }
     }
 }

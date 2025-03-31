@@ -38,7 +38,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
         public async Task<IActionResult> ForgotPassword(string email)
         {
             var user = await _userService.ForgotPassword(email);
-            if (user.Item3.Status == true)
+            if (user.Status == true)
             {
                 return Ok(user);
             }

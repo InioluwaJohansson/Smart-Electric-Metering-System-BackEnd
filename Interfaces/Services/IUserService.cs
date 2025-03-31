@@ -6,7 +6,7 @@ public interface IUserService
 {
     public Task<bool> CheckUserName(string userName);
     public Task<UserLoginResponse> Login(string username, string password);
-    public Task<(string, int, BaseResponse)> ForgotPassword(string email);
+    public Task<ForgotPasswordDto> ForgotPassword(string email);
     public Task<BaseResponse> ChangePassword(int id, string username, string password);
     
 }

@@ -45,16 +45,6 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(meter);
         }
-        [HttpPost("AllocateMeterUnit")]
-        public async Task<IActionResult> AllocateMeterUnit([FromBody] CreateMeterUnitAllocationDto createMeterUnitAllocationDto)
-        {
-            var meter = await _meterService.AllocateMeterUnit(createMeterUnitAllocationDto);
-            if (meter.Status == true)
-            {
-                return Ok(meter);
-            }
-            return Ok(meter);
-        }
         [HttpGet("GetMeterById{id}")]
         public async Task<IActionResult> GetMeterById([FromRoute]int id)
         {

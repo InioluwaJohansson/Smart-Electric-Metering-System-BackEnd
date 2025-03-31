@@ -3,6 +3,7 @@ using Smart_Electric_Metering_System_BackEnd.Entities.Identity;
 using Smart_Electric_Metering_System_BackEnd.Models.DTOs;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Repositories;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Services;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Smart_Electric_Metering_System_BackEnd.Implementations.Services;
 public class CustomerService : ICustomerService
@@ -72,7 +73,7 @@ public class CustomerService : ICustomerService
             var imagePath = "";
             if (updateCustomerDto.Picture != null)
             {
-                var fileName = Path.GetFileNameWithoutExtension(updateCustomerDto.Picture.FileName);
+                /*var fileName = Path.GetFileNameWithoutExtension(updateCustomerDto.Picture.FileName);
                 var filePath = Path.Combine(folderPath, updateCustomerDto.Picture.FileName);
                 var extension = Path.GetExtension(updateCustomerDto.Picture.FileName);
                 if (!System.IO.Directory.Exists(filePath))
@@ -82,6 +83,10 @@ public class CustomerService : ICustomerService
                         await updateCustomerDto.Picture.CopyToAsync(stream);
                     }
                     imagePath = fileName;
+                }*/
+                using(var memoryStream = new MemoryStream()){
+                    updateCustomerDto.Picture.CopyTo(memoryStream);
+                    imagePath = Convert.ToBase64String(memoryStream.ToArray());
                 }
             }
             customer.User.FirstName = updateCustomerDto.FirstName ?? customer.User.FirstName;

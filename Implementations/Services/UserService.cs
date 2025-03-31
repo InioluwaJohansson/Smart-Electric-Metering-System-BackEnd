@@ -40,21 +40,23 @@ public class UserService : IUserService
             Status = false
         };
     }
-    public async Task<(string, int, BaseResponse)> ForgotPassword(string email)
+    public async Task<ForgotPasswordDto> ForgotPassword(string email)
     {
         var user = await _userRepo.Get(c => c.Email == email);
         if (user != null)
         {
-            return ($"{user.UserName}", user.Id,  new BaseResponse{
+            return new ForgotPasswordDto{
+                id = user.Id,
+                username = user.UserName,
                 Status = true,
-                Message = "Valid Email!"
-            });
+                Message = $"Email sent to {email}"
+            };
         }
-        return ("", 0, new BaseResponse()
+        return new ForgotPasswordDto
         {
             Message = "Invalid Email!",
             Status = false
-        });
+        };
     }
     public async Task<BaseResponse> ChangePassword(int id, string username, string password)
     {

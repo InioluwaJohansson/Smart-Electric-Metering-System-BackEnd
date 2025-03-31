@@ -63,7 +63,7 @@ public class AdminService : IAdminService
             var imagePath = "";
             if (updateAdminDto.Picture != null)
             {
-                var fileName = Path.GetFileNameWithoutExtension(updateAdminDto.Picture.FileName);
+                /*var fileName = Path.GetFileNameWithoutExtension(updateAdminDto.Picture.FileName);
                 var filePath = Path.Combine(folderPath, updateAdminDto.Picture.FileName);
                 var extension = Path.GetExtension(updateAdminDto.Picture.FileName);
                 if (!System.IO.Directory.Exists(filePath))
@@ -73,6 +73,10 @@ public class AdminService : IAdminService
                         await updateAdminDto.Picture.CopyToAsync(stream);
                     }
                     imagePath = fileName;
+                }*/
+                using(var memoryStream = new MemoryStream()){
+                    updateAdminDto.Picture.CopyTo(memoryStream);
+                    imagePath = Convert.ToBase64String(memoryStream.ToArray());
                 }
             }
             admin.User.FirstName = updateAdminDto.FirstName ?? admin.User.FirstName;

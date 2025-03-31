@@ -20,3 +20,7 @@ public class UserLoginResponse : BaseResponse
     public GetUserDto Data { get; set; }
     public string Token { get; set; }
 }
+public class ForgotPasswordDto : BaseResponse {
+    public string username { get; set; } 
+    public int id {get; set;}
+}

@@ -24,16 +24,6 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(data);
         }
-        /*[HttpGet("MeterDataToESP32")]
-        public async Task<IActionResult> MeterDataToESP32(string MeterId, string auth)
-        {
-            var data = await _dataService.MeterDataToESP32(MeterId, auth);
-            if (data.Status == true)
-            {
-                return Ok(data);
-            }
-            return Ok(data);
-        }*/
         // GET: api/<DataController>
         [HttpGet("MeterUnitsData")]
         public async Task<IActionResult> MeterUnitsData(int Meterid)

@@ -7,7 +7,6 @@ public interface IMeterService
     public Task<BaseResponse> CreateMeter(CreateMeterDto createMeterDto);
     public Task<BaseResponse> AttachMeterToCustomer(AttachMeterDto attachMeterDto);
     public Task<BaseResponse> UpdateMeter(UpdateMeterDto attachMeterDto);
-    public Task<BaseResponse> AllocateMeterUnit(CreateMeterUnitAllocationDto createMeterUnitAllocationDto);
     public Task<MeterResponse> GetMeterById(int meterId);
     public Task<MetersResponse> GetAllMeters();
 }
