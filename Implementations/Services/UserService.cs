@@ -1,5 +1,3 @@
-using Smart_Electric_Metering_System_BackEnd.Entities;
-using Smart_Electric_Metering_System_BackEnd.Entities.Identity;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Repositories;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Services;
 using Smart_Electric_Metering_System_BackEnd.Models.DTOs;
@@ -12,9 +10,14 @@ public class UserService : IUserService
     {
         _userRepo = userRepo;
     }
+    public async Task<bool> CheckUserName(string userName){
+        var user = await _userRepo.Get(x => x.UserName.StartsWith(userName));
+        if(user == null) return true;
+        return false;
+    }
     public async Task<UserLoginResponse> Login(string username, string password)
     {
-        var user = await _userRepo.Get(c => c.UserName == username);
+        var user = await _userRepo.GetUserById(username);
         if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
         {
             return new UserLoginResponse()
@@ -37,21 +40,23 @@ public class UserService : IUserService
             Status = false
         };
     }
-    public async Task<(string, int, BaseResponse)> ForgotPassword(string email)
+    public async Task<ForgotPasswordDto> ForgotPassword(string email)
     {
         var user = await _userRepo.Get(c => c.Email == email);
         if (user != null)
         {
-            return ($"{user.UserName}", user.Id,  new BaseResponse{
+            return new ForgotPasswordDto{
+                id = user.Id,
+                username = user.UserName,
                 Status = true,
-                Message = "Valid Email!"
-            });
+                Message = $"Email sent to {email}"
+            };
         }
-        return ("", 0, new BaseResponse()
+        return new ForgotPasswordDto
         {
-            Message = "Invalid Username Or Password!",
+            Message = "Invalid Email!",
             Status = false
-        });
+        };
     }
     public async Task<BaseResponse> ChangePassword(int id, string username, string password)
     {

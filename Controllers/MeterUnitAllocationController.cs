@@ -10,12 +10,12 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class MeterUnitAllocationController : ControllerBase
     {
         IMeterUnitAllocationService _meterunitallocationService;
-        MeterUnitAllocationController(IMeterUnitAllocationService meterunitallocationService)
+        public MeterUnitAllocationController(IMeterUnitAllocationService meterunitallocationService)
         {
             _meterunitallocationService = meterunitallocationService;
         }
         [HttpPost("CreateMeterUnitAllocation")]
-        public async Task<IActionResult> CreateMeterUnitAllocation([FromBody] int id, double amount)
+        public async Task<IActionResult> CreateMeterUnitAllocation(int id, double amount)
         {
             var meterunitallocation = await _meterunitallocationService.CreateUnitAllocation(id, amount);
             if (meterunitallocation.Status == true)
@@ -25,8 +25,8 @@ namespace Smart_Metering_System_BackEnd.Controllers
             return Ok(meterunitallocation);
         }
         // GET: api/<MeterUnitAllocationController>
-        [HttpGet("GetMeterUnitAllocationById{id}")]
-        public async Task<IActionResult> GetMeterUnitAllocationById([FromRoute]int meterId)
+        [HttpGet("GetMeterUnitAllocationById")]
+        public async Task<IActionResult> GetMeterUnitAllocationById(int meterId)
         {
             var meterunitallocation = await _meterunitallocationService.GetMeterUnitsAllocation(meterId);
             if (meterunitallocation.Status == true)

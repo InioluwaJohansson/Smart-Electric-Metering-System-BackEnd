@@ -10,12 +10,12 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class DataController : ControllerBase
     {
         IDataService _dataService;
-        DataController(IDataService dataService)
+        public DataController(IDataService dataService)
         {
             _dataService = dataService;
         }
-        [HttpGet("EstablishConnection")]
-        public async Task<IActionResult> EstablishConnection(string MeterId, string auth)
+        [HttpGet("EstablishConnectionByESP32")]
+        public async Task<IActionResult> EstablishConnectionByESP32(string MeterId, string auth)
         {
             var data = await _dataService.EstablishConnection(MeterId, auth);
             if (data.Status == true)
@@ -24,21 +24,11 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(data);
         }
-        [HttpGet("MeterDataToESP32")]
-        public async Task<IActionResult> MeterDataToESP32(string MeterId, string auth)
-        {
-            var data = await _dataService.MeterDataToESP32(MeterId, auth);
-            if (data.Status == true)
-            {
-                return Ok(data);
-            }
-            return Ok(data);
-        }
         // GET: api/<DataController>
-        [HttpGet("MeterUnitsData{id}")]
-        public async Task<IActionResult> MeterUnitsData([FromRoute]int id)
+        [HttpGet("MeterUnitsData")]
+        public async Task<IActionResult> MeterUnitsData(int Meterid)
         {
-            var data = await _dataService.MeterUnitsData(id);
+            var data = await _dataService.MeterUnitsData(Meterid);
             if (data.Status == true)
             {
                 return Ok(data);

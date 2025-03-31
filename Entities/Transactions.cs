@@ -4,7 +4,7 @@ public class Transaction : AuditableEntity
 {
     public DateTime Date { get; set; } = DateTime.Today;
     public DateTime Time { get; set; } = DateTime.UtcNow;
-    public string TransactionId  { get; set; } = Guid.NewGuid().ToString().Substring(0,12);
+    public string TransactionId  { get; set; } = Guid.NewGuid().ToString().Substring(0,16).Replace("-", "").ToUpper();
     public double Rate { get; set; }
     public double BaseCharge { get; set; }
     public double Taxes { get; set; }

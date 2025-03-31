@@ -10,7 +10,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class AdminController : ControllerBase
     {
         IAdminService _adminService;
-        AdminController(IAdminService adminService)
+        public AdminController(IAdminService adminService)
         {
             _adminService = adminService;
         }

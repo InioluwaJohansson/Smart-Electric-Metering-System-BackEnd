@@ -15,6 +15,25 @@ public class PricesService : IPricesService
         _meterRepo = meterRepo;
         _pricesRepo = pricesRepo;
     }
+    public async Task<BaseResponse> CreatePrices(CreatePricesDto createPricesDto){
+        if(createPricesDto != null){
+            var prices = new Prices{
+                ItemName = createPricesDto.ItemName,
+                BaseCharge = createPricesDto.BaseCharge,
+                Rate = createPricesDto.Rate,
+                Taxes = createPricesDto.Taxes
+            };
+            await _pricesRepo.Create(prices);
+            return new BaseResponse{
+                Status = true,
+                Message = "Prices Created!"
+            };
+        }
+        return new BaseResponse{
+            Status = false,
+            Message = "Unable to create Prices!"
+        };
+    }
     public async Task<BaseResponse> UpdatePrices(UpdatePricesDto updatePricesDto){
         var prices = await _pricesRepo.Get(x => x.Id == updatePricesDto.Id);
         if(prices != null){

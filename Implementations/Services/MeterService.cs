@@ -24,7 +24,7 @@ public class MeterService : IMeterService
                 IsActive = false,
                 CreatedBy = createMeterDto.AdminUserId,
                 LastModifiedBy = createMeterDto.AdminUserId,
-                MeterKey = Guid.NewGuid().ToString().Substring(0,9),
+                MeterKey = $"METER{Guid.NewGuid().ToString().Substring(0,8).Replace("-", "").ToUpper()}",
                 IsDeleted = false,
                 UserId = 0,
                 MeterAddress = new Address{
@@ -58,13 +58,6 @@ public class MeterService : IMeterService
             if (meter != null && meter.UserId == 0)
             {
                 meter.UserId = user.Id;
-                meter.BaseLoad = attachMeterDto.BaseLoad;
-                meter.MeterAddress.Country = attachMeterDto.createAddressDto.Country ?? meter.MeterAddress.Country;
-                meter.MeterAddress.State = attachMeterDto.createAddressDto.State ?? meter.MeterAddress.State;
-                meter.MeterAddress.Region = attachMeterDto.createAddressDto.Region ?? meter.MeterAddress.Region;
-                meter.MeterAddress.City = attachMeterDto.createAddressDto.City ?? meter.MeterAddress.City;
-                meter.MeterAddress.Street = attachMeterDto.createAddressDto.Street ?? meter.MeterAddress.Street;
-                meter.MeterAddress.NumberLine = attachMeterDto.createAddressDto.NumberLine ?? meter.MeterAddress.NumberLine;
                 await _meterRepo.Update(meter);
                 return new BaseResponse
                 {
@@ -84,41 +77,39 @@ public class MeterService : IMeterService
             Message = "Error attaching Meter to Customer!"
         };
     }
-    public async Task<BaseResponse> AllocateMeterUnit(CreateMeterUnitAllocationDto createMeterUnitAllocationDto)
+    public async Task<BaseResponse> UpdateMeter(UpdateMeterDto updateMeterDto)
     {
-        if (createMeterUnitAllocationDto != null)
+        var user = await _userRepo.Get(x => x.Id == updateMeterDto.UserId);
+        if (user != null)
         {
-            var meter = await _meterRepo.GetMeterById(createMeterUnitAllocationDto.MeterId);
+            var meter = await _meterRepo.Get(x => x.MeterId == updateMeterDto.MeterId);
             if (meter != null)
             {
-                var meterUnitAllocation = new MeterUnitAllocation()
-                {
-                    MeterId = createMeterUnitAllocationDto.MeterId,
-                    AllocatedUnits = createMeterUnitAllocationDto.AllocatedUnits,
-                    ConsumedUnits = createMeterUnitAllocationDto.ConsumedUnits,
-                    unitAllocationStatus = UnitAllocationStatus.Pending,
-                    CreatedBy = meter.UserId,
-                    LastModifiedBy = meter.UserId,
-                    IsDeleted = false
-                };
-                meter.MeterUnitAllocation.Add(meterUnitAllocation);
+                meter.BaseLoad = updateMeterDto.BaseLoad;
+                meter.IsActive = updateMeterDto.IsActive;
+                meter.MeterAddress.Country = updateMeterDto.updateAddressDto.Country ?? meter.MeterAddress.Country;
+                meter.MeterAddress.State = updateMeterDto.updateAddressDto.State ?? meter.MeterAddress.State;
+                meter.MeterAddress.Region = updateMeterDto.updateAddressDto.Region ?? meter.MeterAddress.Region;
+                meter.MeterAddress.City = updateMeterDto.updateAddressDto.City ?? meter.MeterAddress.City;
+                meter.MeterAddress.Street = updateMeterDto.updateAddressDto.Street ?? meter.MeterAddress.Street;
+                meter.MeterAddress.NumberLine = updateMeterDto.updateAddressDto.NumberLine ?? meter.MeterAddress.NumberLine;
                 await _meterRepo.Update(meter);
                 return new BaseResponse
                 {
                     Status = true,
-                    Message = "Meter Unit Successfully Allocated!"
+                    Message = "Meter Information Updated!"
                 };
             }
             return new BaseResponse
             {
                 Status = false,
-                Message = "Meter Unit not found!"
+                Message = "Meter not found!"
             };
         }
         return new BaseResponse
         {
             Status = false,
-            Message = "Error Allocating Meter Unit!"
+            Message = "Error Finding User!"
         };
     }
     public async Task<MeterResponse> GetMeterById(int meterId)
@@ -144,11 +135,13 @@ public class MeterService : IMeterService
         var meters = await _meterRepo.GetAllMeters();
         if (meters != null)
         {
+            List<GetMeterDto> meterList = new List<GetMeterDto>();
+            foreach (var item in meters) meterList.Add(await GetMeterDto(item));
             return new MetersResponse
             {
                 Status = true,
                 Message = "Meters Found!",
-                Data = (ICollection<GetMeterDto>)meters.Select(x => GetMeterDto(x)).ToList(),
+                Data = meterList,
             };
         }
         return new MetersResponse

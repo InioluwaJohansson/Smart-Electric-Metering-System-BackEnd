@@ -3,6 +3,7 @@ using Smart_Electric_Metering_System_BackEnd.Entities.Identity;
 using Smart_Electric_Metering_System_BackEnd.Models.DTOs;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Repositories;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Services;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Smart_Electric_Metering_System_BackEnd.Implementations.Services;
 public class CustomerService : ICustomerService
@@ -18,18 +19,21 @@ public class CustomerService : ICustomerService
     }
     public async Task<BaseResponse> CreateCustomer(CreateCustomerDto createCustomerDto)
     {
-        var customer = await _userRepo.Get(x => x.UserName == createCustomerDto.createUserDto.UserName);
+        var customer = await _userRepo.Get(x => x.UserName == createCustomerDto.createUserDto.Email);
         if(customer != null)
         {
             return new BaseResponse{
                 Status = false,
-                Message = "Username Taken!"
+                Message = $"{createCustomerDto.createUserDto.Email} has been used!"
             };
         }
         var user = new User{
             FirstName = createCustomerDto.createUserDto.FirstName,
             LastName = createCustomerDto.createUserDto.LastName,
-            UserName = createCustomerDto.createUserDto.UserName,
+            Email = createCustomerDto.createUserDto.Email,
+            UserName = "",
+            PhoneNumber = "",
+            PictureUrl = "",
             Password = BCrypt.Net.BCrypt.HashPassword(createCustomerDto.createUserDto.Password),
         };
         var userrole = await _userRepo.Create(user);
@@ -40,7 +44,7 @@ public class CustomerService : ICustomerService
         userrole.UserRole = userRole;
         await _userRepo.Update(userrole);
         var NewCustomer =  new Customer {
-            CustomerId = $"CUSTOMER{Guid.NewGuid().ToString().Substring(0,5).ToLower()}",
+            CustomerId = $"CUSTOMER{Guid.NewGuid().ToString().Substring(0,8).Replace("-", "").ToUpper()}",
             UserId = userrole.Id,
             Notification = new Notification{
                 PeakUsageAlerts = false,
@@ -69,7 +73,7 @@ public class CustomerService : ICustomerService
             var imagePath = "";
             if (updateCustomerDto.Picture != null)
             {
-                var fileName = Path.GetFileNameWithoutExtension(updateCustomerDto.Picture.FileName);
+                /*var fileName = Path.GetFileNameWithoutExtension(updateCustomerDto.Picture.FileName);
                 var filePath = Path.Combine(folderPath, updateCustomerDto.Picture.FileName);
                 var extension = Path.GetExtension(updateCustomerDto.Picture.FileName);
                 if (!System.IO.Directory.Exists(filePath))
@@ -79,6 +83,10 @@ public class CustomerService : ICustomerService
                         await updateCustomerDto.Picture.CopyToAsync(stream);
                     }
                     imagePath = fileName;
+                }*/
+                using(var memoryStream = new MemoryStream()){
+                    updateCustomerDto.Picture.CopyTo(memoryStream);
+                    imagePath = Convert.ToBase64String(memoryStream.ToArray());
                 }
             }
             customer.User.FirstName = updateCustomerDto.FirstName ?? customer.User.FirstName;
@@ -102,7 +110,7 @@ public class CustomerService : ICustomerService
         };
     }
     public async Task<CustomerResponse> GetCustomerById(int id){
-        var customer = await _customerRepo.Get(c => c.Id == id);
+        var customer = await _customerRepo.GetById(id);
         if (customer == null)
         {
             return new CustomerResponse
@@ -111,16 +119,7 @@ public class CustomerService : ICustomerService
             Message = "Customer not found!"
             };
         }
-        var user = await _userRepo.Get(u => u.Id == customer.UserId);
-        if (user == null)
-        {
-            return new CustomerResponse
-            {
-            Status = false,
-            Message = "User not found!"
-            };
-        }
-        return new CustomerResponse
+        return new CustomerResponse ()
         {
             Status = true,
             Message = "Customer retrieved successfully!",
@@ -128,10 +127,16 @@ public class CustomerService : ICustomerService
         };
     }
     public async Task<CustomersResponse> GetAllCustomers(){
-        var consumer = await _customerRepo.GetByExpression(x => x.IsDeleted == false);
+        var consumer = await _customerRepo.GetCustomers();
         if(consumer != null){
+            List<GetCustomerDto> customers = new List<GetCustomerDto>();
+            foreach (var item in consumer)
+            {
+                var customer = await GetCustomerDetails(item);
+                customers.Add(customer);
+            }
             return new CustomersResponse{
-                Data = (ICollection<GetCustomerDto>)consumer.Select(x => GetCustomerDetails(x)).ToList(),
+                Data = customers,
                 Status =  true,
                 Message = "Consumers Data Retrieved!"
             };
@@ -144,22 +149,17 @@ public class CustomerService : ICustomerService
     }
     public async Task<GetCustomerDto> GetCustomerDetails(Customer customer)
     {
-        var user = await _userRepo.Get(u => u.Id == customer.UserId);
-        var meters = await _meterRepo.GetByExpression(x =>x.UserId == user.Id) ?? null;
-        if (user == null)
-        {
-            return null;
-        }
-        return new GetCustomerDto
+        var meters = await _meterRepo.GetByExpression(x =>x.UserId == customer.User.Id);
+        return new GetCustomerDto ()
         {
             Id = customer.Id,
             CustomerId = customer.CustomerId,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            UserName = user.UserName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber,
-            PictureUrl = user.PictureUrl,
+            FirstName = customer.User.FirstName,
+            LastName = customer.User.LastName,
+            UserName = customer.User.UserName,
+            Email = customer.User.Email,
+            PhoneNumber = customer.User.PhoneNumber,
+            PictureUrl = customer.User.PictureUrl,
             getMeterDto = meters.Select(x => new GetMeterDto{
                 Id = x.Id,
                 MeterId = x.MeterId

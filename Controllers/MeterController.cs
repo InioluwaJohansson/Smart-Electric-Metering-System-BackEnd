@@ -10,7 +10,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class MeterController : ControllerBase
     {
         IMeterService _meterService;
-        MeterController(IMeterService meterService)
+        public MeterController(IMeterService meterService)
         {
             _meterService = meterService;
         }
@@ -24,21 +24,21 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(meter);
         }
-        // GET: api/<MeterController>
-        [HttpPost("AttachMeterToCustomer")]
-        public async Task<IActionResult> AttachMeterToCustomer([FromBody] AttachMeterDto attachMeterDto)
+        [HttpPut("UpdateMeter")]
+        public async Task<IActionResult> UpdateMeter([FromBody] UpdateMeterDto updateMeterDto)
         {
-            var meter = await _meterService.AttachMeterToCustomer(attachMeterDto);
+            var meter = await _meterService.UpdateMeter(updateMeterDto);
             if (meter.Status == true)
             {
                 return Ok(meter);
             }
             return Ok(meter);
         }
-        [HttpPost("AllocateMeterUnit")]
-        public async Task<IActionResult> AllocateMeterUnit([FromBody] CreateMeterUnitAllocationDto createMeterUnitAllocationDto)
+        // GET: api/<MeterController>
+        [HttpPost("AttachMeterToCustomer")]
+        public async Task<IActionResult> AttachMeterToCustomer([FromBody] AttachMeterDto attachMeterDto)
         {
-            var meter = await _meterService.AllocateMeterUnit(createMeterUnitAllocationDto);
+            var meter = await _meterService.AttachMeterToCustomer(attachMeterDto);
             if (meter.Status == true)
             {
                 return Ok(meter);

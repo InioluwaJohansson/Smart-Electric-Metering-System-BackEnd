@@ -1,9 +1,8 @@
 # Smart Electric Metering System BackEnd
-# # Smart Electric Metering System Backend
 
 ## Overview
 
-The Smart Electric Metering System Backend is designed to log and optimize power usage, specifically tailored for the Nigerian consumer power sector. Developed by Makinde T.I, Makinde K.E, Abu A.O, and Adenekan A.A, this backend system serves as the core component for managing and analyzing electricity consumption data.
+The Smart Electric Metering System Backend is designed to log and optimize power usage, specifically tailored for the Nigerian consumer power sector. Developed by Makinde T.I, Abu A.O, and Adenekan A.A, this backend system serves as the core component for managing and analyzing electricity consumption data.
 
 ## Features
 
@@ -24,7 +23,7 @@ Context: Defines the database context and configurations.
 Contracts: Houses interfaces and abstract classes that define the contracts for implementations.
 Controllers: Contains the API controllers that handle HTTP requests and responses.
 Entities: Defines the data models and entities used in the system.
-Implementations: Includes concrete implementations of the contracts and business logic.
+Implementations: Includes concrete implementations of the contracts and data logic.
 Interfaces: Contains interface definitions for dependency injection and abstraction.
 Migrations: Stores database migration files for version control.
 Models: Houses data transfer objects and view models used across the application.

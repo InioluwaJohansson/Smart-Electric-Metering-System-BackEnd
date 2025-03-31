@@ -10,8 +10,8 @@ public class CreateMeterDto
 }
 public class UpdateMeterDto
 {
-    public int Id { get; set; }
     public string MeterId { get; set; }
+    public int UserId { get; set; }
     public double BaseLoad { get; set; }
     public UpdateAddressDto updateAddressDto { get; set; }
     public bool IsActive { get; set; }
@@ -36,8 +36,6 @@ public class AttachMeterDto{
     public string MeterId { get; set; }
     public string MeterKey { get; set; }
     public int UserId { get; set; }
-    public double BaseLoad { get; set; }
-    public CreateAddressDto createAddressDto { get; set; }
 }
 public class ESP32Response : BaseResponse
 {
