@@ -10,11 +10,10 @@ public class CreateMeterDto
 }
 public class UpdateMeterDto
 {
-    public string MeterId { get; set; }
+    public int MeterId { get; set; }
     public int UserId { get; set; }
     public double BaseLoad { get; set; }
     public UpdateAddressDto updateAddressDto { get; set; }
-    public bool IsActive { get; set; }
 }
 public class GetMeterDto
 {

@@ -25,6 +25,8 @@ public class UserService : IUserService
                 Data = new GetUserDto()
                 {
                     Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
                     Email = user.Email,
                     UserName = user.UserName,
                     RoleName = user.UserRole.Role.ToString(),

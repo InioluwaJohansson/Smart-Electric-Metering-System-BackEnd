@@ -16,12 +16,12 @@ public class AdminService : IAdminService
     }
     public async Task<BaseResponse> CreateAdmin(CreateAdminDto createAdminDto)
     {
-        var Admin = await _userRepo.Get(x => x.UserName == createAdminDto.createUserDto.Email);
+        var Admin = await _userRepo.Get(x => x.Email == createAdminDto.createUserDto.Email);
         if(Admin != null)
         {
             return new BaseResponse{
                 Status = false,
-                Message = "Username Taken!"
+                Message = "Email Taken!"
             };
         }
         var user = new User{

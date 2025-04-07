@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Smart_Electric_Metering_System_BackEnd;
@@ -45,7 +46,20 @@ builder.Services.AddSwaggerGen(x =>
 {
     x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo {Title = $"{builder.Configuration["ApplicationDetails:AppName"]}", Version = "v1"});
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = false;
+});
 var key = "Auth Key";
 builder.Services.AddSingleton<JWTAuthentication>(new JWTAuthentication(key));
 
@@ -76,7 +90,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("Policies");
+app.UseCors("AllowAll");
 
 app.UseStaticFiles();
 
