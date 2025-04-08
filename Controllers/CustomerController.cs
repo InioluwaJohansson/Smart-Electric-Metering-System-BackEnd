@@ -27,6 +27,10 @@ namespace Smart_Metering_System_BackEnd.Controllers
         [HttpPut("UpdateCustomer")]
         public async Task<IActionResult> UpdateCustomer([FromBody] UpdateCustomerDto updateCustomerDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var customer = await _customerService.UpdateCustomer(updateCustomerDto);
             if (customer.Status == true)
             {

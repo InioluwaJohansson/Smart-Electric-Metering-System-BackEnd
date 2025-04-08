@@ -20,7 +20,7 @@ public class GetMeterUnitAllocationDto
     public double PeakLoad { get; set; }
     public double OffPeakLoad { get; set; }
     public GetTransactionDto GetTransactionDto { get; set; }
-    public UnitAllocationStatus unitAllocationStatus { get; set; }
+    public string unitAllocationStatus { get; set; }
 }
 public class MeterUnitAllocationResponse : BaseResponse
 {

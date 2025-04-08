@@ -45,10 +45,30 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(meter);
         }
+        [HttpGet("UpdateMeterStatus{id}")]
+        public async Task<IActionResult> UpdateMeterStatus([FromRoute]int id)
+        {
+            var meter = await _meterService.UpdateMeterStatus(id);
+            if (meter.Status == true)
+            {
+                return Ok(meter);
+            }
+            return Ok(meter);
+        }
         [HttpGet("GetMeterById{id}")]
         public async Task<IActionResult> GetMeterById([FromRoute]int id)
         {
             var meter = await _meterService.GetMeterById(id);
+            if (meter.Status == true)
+            {
+                return Ok(meter);
+            }
+            return Ok(meter);
+        }
+        [HttpGet("GetMetersByUserId{id}")]
+        public async Task<IActionResult> GetMeterByUserId([FromRoute]int id)
+        {
+            var meter = await _meterService.GetMeterByUserId(id);
             if (meter.Status == true)
             {
                 return Ok(meter);

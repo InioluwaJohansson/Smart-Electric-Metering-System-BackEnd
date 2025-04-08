@@ -82,7 +82,7 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
             BaseLoad = meterUnitAllocation.BaseLoad,
             PeakLoad = meterUnitAllocation.PeakLoad,
             OffPeakLoad = meterUnitAllocation.OffPeakLoad,
-            unitAllocationStatus = meterUnitAllocation.unitAllocationStatus,
+            unitAllocationStatus = meterUnitAllocation.unitAllocationStatus.ToString(),
             GetTransactionDto = new GetTransactionDto{
                 TransactionId = meterUnitAllocation.Transaction.TransactionId,
                 Date = meterUnitAllocation.Transaction.Date,
@@ -90,7 +90,7 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
                 Rate = meterUnitAllocation.Transaction.Rate,
                 BaseCharge = meterUnitAllocation.Transaction.BaseCharge,
                 Taxes = meterUnitAllocation.Transaction.Taxes,
-                Total = meterUnitAllocation.Transaction.Taxes
+                Total = meterUnitAllocation.Transaction.Total
             },
         };
     }

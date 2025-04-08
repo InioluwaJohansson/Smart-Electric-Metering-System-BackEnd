@@ -14,10 +14,10 @@ public class BackgroundServices : BackgroundService
         while(!stoppingToken.IsCancellationRequested){
             var scope = _serviceScopeFactory.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<SmartElectricMeteringContext>();
-            await Task.CompletedTask;
             var _dataService = scope.ServiceProvider.GetRequiredService<IDataService>();
             await _dataService.CheckConnection();
-            await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
+            await Task.Delay(TimeSpan.FromMinutes(2));
+            await Task.CompletedTask;
         }
     }
 }

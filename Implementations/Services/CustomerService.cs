@@ -19,7 +19,7 @@ public class CustomerService : ICustomerService
     }
     public async Task<BaseResponse> CreateCustomer(CreateCustomerDto createCustomerDto)
     {
-        var customer = await _userRepo.Get(x => x.UserName == createCustomerDto.createUserDto.Email);
+        var customer = await _userRepo.Get(x => x.Email == createCustomerDto.createUserDto.Email);
         if(customer != null)
         {
             return new BaseResponse{
@@ -65,38 +65,41 @@ public class CustomerService : ICustomerService
         var customer = await _customerRepo.GetById(updateCustomerDto.Id);
         if(customer != null)
         {
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\..\\Images\\");
-            if (!System.IO.Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            var imagePath = "";
-            if (updateCustomerDto.Picture != null)
-            {
-                /*var fileName = Path.GetFileNameWithoutExtension(updateCustomerDto.Picture.FileName);
-                var filePath = Path.Combine(folderPath, updateCustomerDto.Picture.FileName);
-                var extension = Path.GetExtension(updateCustomerDto.Picture.FileName);
-                if (!System.IO.Directory.Exists(filePath))
-                {
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await updateCustomerDto.Picture.CopyToAsync(stream);
-                    }
-                    imagePath = fileName;
-                }*/
-                using(var memoryStream = new MemoryStream()){
-                    updateCustomerDto.Picture.CopyTo(memoryStream);
-                    imagePath = Convert.ToBase64String(memoryStream.ToArray());
-                }
-            }
+            // var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\..\\Images\\");
+            // if (!System.IO.Directory.Exists(folderPath))
+            // {
+            //     Directory.CreateDirectory(folderPath);
+            // }
+            // var imagePath = "";
+            // if (updateCustomerDto.Picture != null)
+            // {
+            //     /*var fileName = Path.GetFileNameWithoutExtension(updateCustomerDto.Picture.FileName);
+            //     var filePath = Path.Combine(folderPath, updateCustomerDto.Picture.FileName);
+            //     var extension = Path.GetExtension(updateCustomerDto.Picture.FileName);
+            //     if (!System.IO.Directory.Exists(filePath))
+            //     {
+            //         using (var stream = new FileStream(filePath, FileMode.Create))
+            //         {
+            //             await updateCustomerDto.Picture.CopyToAsync(stream);
+            //         }
+            //         imagePath = fileName;
+            //     }*/
+            //     using(var memoryStream = new MemoryStream()){
+            //         updateCustomerDto.Picture.CopyTo(memoryStream);
+            //         imagePath = Convert.ToBase64String(memoryStream.ToArray());
+            //     }
+            // }
+            customer.User.UserName = updateCustomerDto.UserName ?? customer.User.UserName;
+            customer.User.Email = updateCustomerDto.Email ?? customer.User.Email;
             customer.User.FirstName = updateCustomerDto.FirstName ?? customer.User.FirstName;
             customer.User.LastName = updateCustomerDto.LastName ?? customer.User.LastName;
-            customer.User.PictureUrl = imagePath ?? customer.User.PictureUrl;
-            customer.Notification.PeakUsageAlerts = updateCustomerDto.updateNotificationDto.PeakUsageAlerts;
-            customer.Notification.UsageThresholdAlerts = updateCustomerDto.updateNotificationDto.UsageThresholdAlerts;
-            customer.Notification.UsageAlerts = updateCustomerDto.updateNotificationDto.UsageAlerts;
-            customer.Notification.BillingNotifications = updateCustomerDto.updateNotificationDto.BillingNotifications;
-            customer.Notification.PushNotifications = updateCustomerDto.updateNotificationDto.PushNotifications;
+            customer.User.PhoneNumber = updateCustomerDto.PhoneNumber ?? customer.User.PhoneNumber;
+            customer.User.PictureUrl = updateCustomerDto.Picture ?? customer.User.PictureUrl;
+            customer.Notification.PeakUsageAlerts = updateCustomerDto.PeakUsageAlerts;
+            customer.Notification.UsageThresholdAlerts = updateCustomerDto.UsageThresholdAlerts;
+            customer.Notification.UsageAlerts = updateCustomerDto.UsageAlerts;
+            customer.Notification.BillingNotifications = updateCustomerDto.BillingNotifications;
+            customer.Notification.PushNotifications = updateCustomerDto.PushNotifications;
             customer.LastModifiedOn = DateTime.Now;
             await _customerRepo.Update(customer);
             return new BaseResponse{
@@ -162,7 +165,10 @@ public class CustomerService : ICustomerService
             PictureUrl = customer.User.PictureUrl,
             getMeterDto = meters.Select(x => new GetMeterDto{
                 Id = x.Id,
-                MeterId = x.MeterId
+                MeterId = x.MeterId,
+                CustomerName = customer.User.FirstName + " " + customer.User.LastName,
+                TotalUnits = x.TotalUnits,
+                ConsumedUnits = x.ConsumedUnits,
             }).ToList(),
             getNotificationDto = new GetNotificationDto{
                 PeakUsageAlerts = customer.Notification.PeakUsageAlerts,

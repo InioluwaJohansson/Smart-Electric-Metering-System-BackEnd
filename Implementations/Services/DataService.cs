@@ -179,12 +179,23 @@ public class DataService : IDataService
         }
         return true;
     }
-    public async Task CheckConnection(){
+    public async Task CheckConnection()
+    {
         var meters = await _meterRepo.GetByExpression(x => x.IsActive == true);
         if(meters != null){
             foreach(var meter in meters){
                 var meterUnit = await _meterUnitsRepo.GetByExpression(x => x.MeterId == meter.Id);
-                if(DateTime.Now > meterUnit.Last().TimeValue.AddMinutes(-2)){
+                if(meterUnit != null && meterUnit.Count() > 0){
+                    if(DateTime.Now > meterUnit.Last().TimeValue.AddMinutes(2)){
+                        meter.IsActive = false;
+                        await _meterRepo.Update(meter);
+                    }
+                    else{
+                        meter.IsActive = true;
+                        await _meterRepo.Update(meter);
+                    }
+                }
+                else{
                     meter.IsActive = false;
                     await _meterRepo.Update(meter);
                 }

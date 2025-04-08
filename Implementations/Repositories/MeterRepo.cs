@@ -12,7 +12,11 @@ public class MeterRepo : GenericRepo<Meter>, IMeterRepo
     }
     public async Task<Meter> GetMeterById(int id)
     {
-        return await context.Meters.Include(x => x.MeterAddress).Include(x => x.MeterUnitAllocation).ThenInclude(x => x.Transaction).Include(x => x.MeterUnits).SingleOrDefaultAsync(x => x.Id == id && x.IsDeleted == false);
+        return await context.Meters.Include(x => x.MeterAddress).Include(x => x.MeterUnitAllocation).ThenInclude(x => x.Transaction).Include(x => x.MeterUnits).FirstOrDefaultAsync(x => x.Id == id && x.IsDeleted == false);
+    }
+    public async Task<IList<Meter>> GetMeterByUserId(int userId)
+    {
+        return await context.Meters.Include(x => x.MeterAddress).Include(x => x.MeterUnitAllocation).ThenInclude(x => x.Transaction).Include(x => x.MeterUnits).Where(x => x.IsDeleted == false && x.UserId == userId).ToListAsync();
     }
     public async Task<IList<Meter>> GetAllMeters()
     {

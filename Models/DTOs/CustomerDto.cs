@@ -9,9 +9,15 @@ public class UpdateCustomerDto
     public int Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    public string UserName { get; set; }
+    public string Email { get; set; }
     public string PhoneNumber { get;set; }
-    public IFormFile Picture { get; set; }
-    public UpdateNotificationDto updateNotificationDto { get; set; }
+    public string Picture { get; set; }
+    public bool PeakUsageAlerts { get; set; }
+    public bool UsageThresholdAlerts { get; set; }
+    public bool UsageAlerts { get; set; }
+    public bool BillingNotifications { get; set; }
+    public bool PushNotifications { get; set; }
 }
 public class GetCustomerDto
 {
