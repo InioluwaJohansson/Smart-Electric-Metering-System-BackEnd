@@ -65,6 +65,7 @@ public class DataService : IDataService
                 ConsumptionValue = powerInkWh,
                 ElectricityCost = (await _pricesRepo.Get(x => x.Id == 1)).Rate * powerInkWh,
             };
+            Console.WriteLine("Units: " + unit);
             if(meterUnitAllocationResolve.Item1 == false && meterUnitAllocationResolve.Item2 == false && meterUnitAllocationResolve.Item3 == 0){
                 unit = null;
             }
@@ -133,11 +134,20 @@ public class DataService : IDataService
         var meter = await _meterRepo.Get(x => x.Id == meterId);
         var engDiff = 0.00;
         if(meterUnitAllocation != null){
-            meterUnitAllocation = meterUnitAllocation.OrderByDescending(x => x).ToList();
+            meterUnitAllocation = meterUnitAllocation.OrderBy(x => x.Id).ToList();
             if(meterUnitAllocation.First().AllocatedUnits < meterUnitAllocation.First().ConsumedUnits){
                 engDiff = meterUnitAllocation.First().ConsumedUnits - meterUnitAllocation.First().AllocatedUnits;
                 meterUnitAllocation.First().ConsumedUnits -= engDiff;
                 meterUnitAllocation.First().unitAllocationStatus = UnitAllocationStatus.Inactive;
+                if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
+                    meterUnitAllocation.First().PeakLoad += powerInkWh - engDiff;
+                }else{
+                    meterUnitAllocation.First().OffPeakLoad += powerInkWh - engDiff;
+                }
+                await _meterUnitAllocationRepo.Update(meterUnitAllocation.First());
+                return (true, true, 0);
+            }
+            else if(meterUnitAllocation.First().AllocatedUnits > meterUnitAllocation.First().ConsumedUnits){
                 if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
                     meterUnitAllocation.First().PeakLoad += powerInkWh - engDiff;
                 }else{

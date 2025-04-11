@@ -60,6 +60,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = false;
 });
+
 var key = "Auth Key";
 builder.Services.AddSingleton<JWTAuthentication>(new JWTAuthentication(key));
 
