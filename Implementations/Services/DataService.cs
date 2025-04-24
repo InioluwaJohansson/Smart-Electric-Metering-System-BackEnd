@@ -60,12 +60,11 @@ public class DataService : IDataService
                 PowerValue = createMeterUnitsDto.PowerValue,
                 VoltageValue = createMeterUnitsDto.VoltageValue,
                 CurrentValue = createMeterUnitsDto.CurrentValue,
-                PowerFactorValue = createMeterUnitsDto.PowerFactorValue,
-                TimeValue = createMeterUnitsDto.TimeValue,
+                PowerFactorValue = 0.00,
+                TimeValue = DateTime.Now,
                 ConsumptionValue = powerInkWh,
                 ElectricityCost = (await _pricesRepo.Get(x => x.Id == 1)).Rate * powerInkWh,
             };
-            Console.WriteLine("Units: " + unit);
             if(meterUnitAllocationResolve.Item1 == false && meterUnitAllocationResolve.Item2 == false && meterUnitAllocationResolve.Item3 == 0){
                 unit = null;
             }
@@ -139,7 +138,7 @@ public class DataService : IDataService
                 engDiff = meterUnitAllocation.First().ConsumedUnits - meterUnitAllocation.First().AllocatedUnits;
                 meterUnitAllocation.First().ConsumedUnits -= engDiff;
                 meterUnitAllocation.First().unitAllocationStatus = UnitAllocationStatus.Inactive;
-                if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
+                if(DateTime.Today.AddHours(8) < DateTime.Now && DateTime.Today.AddHours(17) >= DateTime.Now){
                     meterUnitAllocation.First().PeakLoad += powerInkWh - engDiff;
                 }else{
                     meterUnitAllocation.First().OffPeakLoad += powerInkWh - engDiff;
@@ -148,7 +147,7 @@ public class DataService : IDataService
                 return (true, true, 0);
             }
             else if(meterUnitAllocation.First().AllocatedUnits > meterUnitAllocation.First().ConsumedUnits){
-                if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
+                if(DateTime.Today.AddHours(8) < DateTime.Now && DateTime.Today.AddHours(17) >= DateTime.Now){
                     meterUnitAllocation.First().PeakLoad += powerInkWh - engDiff;
                 }else{
                     meterUnitAllocation.First().OffPeakLoad += powerInkWh - engDiff;
@@ -159,7 +158,7 @@ public class DataService : IDataService
             else if(meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1] != null && meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus == UnitAllocationStatus.Pending && meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].ConsumedUnits == 0){
                 meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].ConsumedUnits += engDiff;
                 meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus = UnitAllocationStatus.Active;
-                if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
+                if(DateTime.Today.AddHours(8) < DateTime.Now && DateTime.Today.AddHours(17) >= DateTime.Now){
                     meterUnitAllocation.First().PeakLoad += engDiff;
                 }else{
                     meterUnitAllocation.First().OffPeakLoad += engDiff;
