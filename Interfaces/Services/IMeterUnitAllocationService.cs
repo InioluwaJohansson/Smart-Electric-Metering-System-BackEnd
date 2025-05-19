@@ -6,4 +6,5 @@ public interface IMeterUnitAllocationService
 {
     public Task<BaseResponse> CreateUnitAllocation(int meterId, double amount);
     public Task<MeterUnitAllocationsResponse> GetMeterUnitsAllocation(int meterId);
+    public Task<MeterUnitAllocationsResponse> GetAllMeterUnitsAllocation();
 }

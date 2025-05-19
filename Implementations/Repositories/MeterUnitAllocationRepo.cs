@@ -17,4 +17,7 @@ public class MeterUnitAllocationRepo : GenericRepo<MeterUnitAllocation>, IMeterU
     public async Task<List<MeterUnitAllocation>> GetMeterUnitAllocations(int id){
         return await context.MeterUnitAllocations.Include(x => x.Transaction).Where(x => x.MeterId == id).ToListAsync();
     }
+    public async Task<List<MeterUnitAllocation>> GetAllMeterUnitAllocations(){
+        return await context.MeterUnitAllocations.Include(x => x.Transaction).OrderBy(x => x.CreatedOn).ToListAsync();
+    }
 }

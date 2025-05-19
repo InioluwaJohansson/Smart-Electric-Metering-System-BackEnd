@@ -11,4 +11,5 @@ public interface IMeterService
     public Task<MeterResponse> GetMeterById(int meterId);
     public Task<MetersResponse> GetMeterByUserId(int userId);
     public Task<MetersResponse> GetAllMeters();
+    public Task<MeterUnitsResponse> GetAllMeterUnits();
 }

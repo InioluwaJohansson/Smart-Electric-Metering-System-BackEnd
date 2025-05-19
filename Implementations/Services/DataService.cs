@@ -13,8 +13,14 @@ public class DataService : IDataService
     IMeterUnitAllocationRepo _meterUnitAllocationRepo;
     IMeterPromptService _meterPromptService;
     IPricesRepo _pricesRepo;
-    public DataService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IMeterPromptService meterPromptService, IPricesRepo pricesRepo)
+    ICustomerService _cutomerService;
+    IMeterService _meterService;
+    IMeterUnitAllocationService _meterUnitAllocationService;
+    public DataService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IMeterPromptService meterPromptService, IPricesRepo pricesRepo, ICustomerService customerService, IMeterService meterService, IMeterUnitAllocationService meterUnitAllocationService)
     {
+        _meterService = meterService;
+        _meterUnitAllocationService = meterUnitAllocationService;
+        _cutomerService = customerService;
         _meterRepo = meterRepo;
         _meterUnitsRepo = meterUnitsRepo;
         _meterUnitAllocationRepo = meterUnitAllocationRepo;
@@ -210,5 +216,30 @@ public class DataService : IDataService
                 }
             }
         }
+    }
+    public async Task<DashBoardResponse> GetDashBoardData()
+    {
+        var customers = await _cutomerService.GetAllCustomers();
+        var meters = await _meterService.GetAllMeters();
+        var meterUnits = await _meterUnitAllocationService.GetAllMeterUnitsAllocation();
+        if (customers != null || meters != null || meterUnits != null)
+        {
+            return new DashBoardResponse
+            {
+                dashboardDto = new DashBoardDto
+                {
+                    getCustomerDto = customers.Data.ToList(),
+                    getMeterDto = meters.Data.ToList(),
+                    getTransactionDto = meterUnits.Data.Select(x => x.GetTransactionDto).ToList()
+                },
+                Status = true
+            };
+        }
+        return new DashBoardResponse
+        {
+            dashboardDto = null,
+            Status = false,
+            Message = "Unable to fetch Dashboard Data!"
+        };
     }
 }

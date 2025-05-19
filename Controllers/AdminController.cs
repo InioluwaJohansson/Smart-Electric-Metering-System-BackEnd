@@ -27,6 +27,10 @@ namespace Smart_Metering_System_BackEnd.Controllers
         [HttpPut("UpdateAdmin")]
         public async Task<IActionResult> UpdateAdmin([FromBody] UpdateAdminDto updateAdminDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var admin = await _adminService.UpdateAdmin(updateAdminDto);
             if (admin.Status == true)
             {
@@ -55,7 +59,7 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(admin);
         }
-        [HttpPut("DeleteAdmin{id}")]
+        [HttpDelete("DeleteAdmin{id}")]
         public async Task<IActionResult> DeleteAdmin([FromRoute]int id)
         {
             var admin = await _adminService.DeleteAdmin(id);

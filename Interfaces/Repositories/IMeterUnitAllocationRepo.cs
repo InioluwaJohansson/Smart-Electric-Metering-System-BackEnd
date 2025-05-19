@@ -6,4 +6,5 @@ public interface IMeterUnitAllocationRepo : IGenericRepo<MeterUnitAllocation>
 {
     public Task<MeterUnitAllocation> GetMeterUnitAllocation(int id);
     public Task<List<MeterUnitAllocation>> GetMeterUnitAllocations(int id);
+    public Task<List<MeterUnitAllocation>> GetAllMeterUnitAllocations();
 }

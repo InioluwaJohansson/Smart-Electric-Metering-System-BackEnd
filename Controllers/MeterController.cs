@@ -85,5 +85,15 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(meter);
         }
+        [HttpGet("GetAllMeterUnits")]
+        public async Task<IActionResult> GetAllMeterUnits()
+        {
+            var meter = await _meterService.GetAllMeterUnits();
+            if (meter.Status == true)
+            {
+                return Ok(meter);
+            }
+            return Ok(meter);
+        }
     }
 }

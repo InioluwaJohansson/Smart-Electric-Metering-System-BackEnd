@@ -326,7 +326,17 @@ export const getMeterPrompts = async (meterId: number): Promise<MeterPromptRespo
     throw new Error('Failed to update meter prompts');
   }
 };
-
+export const getMeterUnitsData = async (id: number): Promise<DataResponse> => {
+  try {
+    const response = await axios.get<DataResponse>(
+      `${API_BASE_URL}SEMS/Data/MeterUnitsData?Meterid=${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error creating meter unit allocation:', error);
+    throw new Error('Failed to create meter unit allocation');
+  }
+};
 export const createMeterUnitAllocation = async (id: number, amount: number): Promise<DataResponse> => {
   try {
     const response = await axios.post<DataResponse>(
@@ -343,6 +353,19 @@ export const getMeterUnitAllocationById = async (meterId: number): Promise<Meter
   try {
     const response = await axios.get<MeterUnitAllocationData[]>(
       `${API_BASE_URL}SEMS/MeterUnitAllocation/GetMeterUnitAllocationById?meterId=${meterId}`,
+      { headers: { "Accept": "*/*" } }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching meter unit allocation by id:', error);
+    throw new Error('Failed to fetch meter unit allocation');
+  }
+};
+
+export const getAllMeterUnitsAllocation = async (): Promise<MeterUnitAllocationData[]> => {
+  try {
+    const response = await axios.get<MeterUnitAllocationData[]>(
+      `${API_BASE_URL}SEMS/MeterUnitAllocation/GetAllMeterUnitsAllocation`,
       { headers: { "Accept": "*/*" } }
     );
     return response.data;
@@ -442,8 +465,10 @@ const apiMethods = {
   getAllMeters,
   updateMeterPrompts,
   getMeterPrompts,
+  getMeterUnitsData,
   createMeterUnitAllocation,
   getMeterUnitAllocationById,
+  getAllMeterUnitsAllocation,
   updatePrices,
   getPrices,
   checkUserName,
