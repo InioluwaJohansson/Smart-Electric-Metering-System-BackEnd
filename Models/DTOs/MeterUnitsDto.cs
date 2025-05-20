@@ -7,8 +7,6 @@ public class CreateMeterUnitsDto
     public double PowerValue { get; set; }
     public double VoltageValue { get; set; }
     public double CurrentValue { get; set; }
-    public double PowerFactorValue { get; set; }
-    public DateTime TimeValue { get; set; }
     public bool Status { get; set; }
 
 }

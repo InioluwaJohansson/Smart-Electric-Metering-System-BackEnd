@@ -73,6 +73,21 @@ public class MeterUnitAllocationService : IMeterUnitAllocationService
             Message = "Unable to retrieve data!"
         };
     }
+    public async Task<MeterUnitAllocationsResponse> GetAllMeterUnitsAllocation(){
+        var meterUnits = await _meterUnitAllocationRepo.GetAllMeterUnitAllocations();
+        if(meterUnits != null){
+            return new MeterUnitAllocationsResponse{
+                Data = meterUnits.Select(x => GetMeterUnitAllocationDto(x)).ToList(),
+                Status = true,
+                Message = "Data Retrieved!"
+            };
+        }
+        return new MeterUnitAllocationsResponse{
+            Data = null,
+            Status = false,
+            Message = "Unable to retrieve data!"
+        };
+    }
     public GetMeterUnitAllocationDto GetMeterUnitAllocationDto(MeterUnitAllocation meterUnitAllocation){
         return new GetMeterUnitAllocationDto{
             Id = meterUnitAllocation.Id,

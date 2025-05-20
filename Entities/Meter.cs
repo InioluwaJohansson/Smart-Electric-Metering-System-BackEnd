@@ -5,7 +5,7 @@ public class Meter : AuditableEntity
     public int UserId { get; set; }
     public string MeterId { get; set; } = $"METER{Guid.NewGuid().ToString().Substring(0,8).Replace("-", "").ToUpper()}";
     public string MeterKey { get; set; } 
-    public string ConnectionAuth {  get; set; } = Guid.NewGuid().ToString().Substring(0, 16);
+    public string ConnectionAuth {  get; set; } = Guid.NewGuid().ToString().Substring(0, 18);
     public double TotalUnits { get; set; } = 0.00;
     public double ConsumedUnits { get; set; } = 0.00;
     public double BaseLoad { get; set; } = 0.00;

@@ -35,5 +35,15 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(meterunitallocation);
         }
+        [HttpGet("GetAllMeterUnitsAllocation")]
+        public async Task<IActionResult> GetAllMeterUnitsAllocation()
+        {
+            var meterunitallocation = await _meterunitallocationService.GetAllMeterUnitsAllocation();
+            if (meterunitallocation.Status == true)
+            {
+                return Ok(meterunitallocation);
+            }
+            return Ok(meterunitallocation);
+        }
     }
 }

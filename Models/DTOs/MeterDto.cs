@@ -30,6 +30,7 @@ public class GetMeterDto
     public List<GetMeterUnitsDto> GetMeterUnitsDto { get; set; }
     public bool IsActive { get; set; }
     public bool ActiveLoad { get; set; }
+    public DateTime DateCreated { get; set; }
 }
 public class AttachMeterDto{
     public string MeterId { get; set; }

@@ -55,36 +55,36 @@ public class AdminService : IAdminService
         var admin = await _adminRepo.GetById(updateAdminDto.Id);
         if(admin != null)
         {
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\..\\Images\\");
-            if (!System.IO.Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            var imagePath = "";
-            if (updateAdminDto.Picture != null)
-            {
-                /*var fileName = Path.GetFileNameWithoutExtension(updateAdminDto.Picture.FileName);
-                var filePath = Path.Combine(folderPath, updateAdminDto.Picture.FileName);
-                var extension = Path.GetExtension(updateAdminDto.Picture.FileName);
-                if (!System.IO.Directory.Exists(filePath))
-                {
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await updateAdminDto.Picture.CopyToAsync(stream);
-                    }
-                    imagePath = fileName;
-                }*/
-                using(var memoryStream = new MemoryStream()){
-                    updateAdminDto.Picture.CopyTo(memoryStream);
-                    imagePath = Convert.ToBase64String(memoryStream.ToArray());
-                }
-            }
+            // var folderPath = Path.Combine(Directory.GetCurrentDirectory() + "..\\..\\Images\\");
+            // if (!System.IO.Directory.Exists(folderPath))
+            // {
+            //     Directory.CreateDirectory(folderPath);
+            // }
+            // var imagePath = "";
+            // if (updateAdminDto.Picture != null)
+            // {
+            //     /*var fileName = Path.GetFileNameWithoutExtension(updateAdminDto.Picture.FileName);
+            //     var filePath = Path.Combine(folderPath, updateAdminDto.Picture.FileName);
+            //     var extension = Path.GetExtension(updateAdminDto.Picture.FileName);
+            //     if (!System.IO.Directory.Exists(filePath))
+            //     {
+            //         using (var stream = new FileStream(filePath, FileMode.Create))
+            //         {
+            //             await updateAdminDto.Picture.CopyToAsync(stream);
+            //         }
+            //         imagePath = fileName;
+            //     }*/
+            //     using(var memoryStream = new MemoryStream()){
+            //         updateAdminDto.Picture.CopyTo(memoryStream);
+            //         imagePath = Convert.ToBase64String(memoryStream.ToArray());
+            //     }
+            // }
             admin.User.FirstName = updateAdminDto.FirstName ?? admin.User.FirstName;
             admin.User.LastName = updateAdminDto.LastName ?? admin.User.LastName;
             admin.User.UserName = updateAdminDto.UserName ?? admin.User.UserName;
             admin.User.Email = updateAdminDto.Email ?? admin.User.Email;
             admin.User.PhoneNumber = updateAdminDto.PhoneNumber ?? admin.User.PhoneNumber;
-            admin.User.PictureUrl = imagePath ?? admin.User.PictureUrl;
+            admin.User.PictureUrl = updateAdminDto.PictureUrl ?? admin.User.PictureUrl;
             admin.LastModifiedOn = DateTime.Now;
             await _adminRepo.Update(admin);
             return new BaseResponse{

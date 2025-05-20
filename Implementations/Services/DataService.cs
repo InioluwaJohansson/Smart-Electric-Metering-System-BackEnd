@@ -13,8 +13,14 @@ public class DataService : IDataService
     IMeterUnitAllocationRepo _meterUnitAllocationRepo;
     IMeterPromptService _meterPromptService;
     IPricesRepo _pricesRepo;
-    public DataService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IMeterPromptService meterPromptService, IPricesRepo pricesRepo)
+    ICustomerService _cutomerService;
+    IMeterService _meterService;
+    IMeterUnitAllocationService _meterUnitAllocationService;
+    public DataService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IMeterUnitAllocationRepo meterUnitAllocationRepo, IMeterPromptService meterPromptService, IPricesRepo pricesRepo, ICustomerService customerService, IMeterService meterService, IMeterUnitAllocationService meterUnitAllocationService)
     {
+        _meterService = meterService;
+        _meterUnitAllocationService = meterUnitAllocationService;
+        _cutomerService = customerService;
         _meterRepo = meterRepo;
         _meterUnitsRepo = meterUnitsRepo;
         _meterUnitAllocationRepo = meterUnitAllocationRepo;
@@ -60,8 +66,8 @@ public class DataService : IDataService
                 PowerValue = createMeterUnitsDto.PowerValue,
                 VoltageValue = createMeterUnitsDto.VoltageValue,
                 CurrentValue = createMeterUnitsDto.CurrentValue,
-                PowerFactorValue = createMeterUnitsDto.PowerFactorValue,
-                TimeValue = createMeterUnitsDto.TimeValue,
+                PowerFactorValue = 0.00,
+                TimeValue = DateTime.Now,
                 ConsumptionValue = powerInkWh,
                 ElectricityCost = (await _pricesRepo.Get(x => x.Id == 1)).Rate * powerInkWh,
             };
@@ -133,12 +139,21 @@ public class DataService : IDataService
         var meter = await _meterRepo.Get(x => x.Id == meterId);
         var engDiff = 0.00;
         if(meterUnitAllocation != null){
-            meterUnitAllocation = meterUnitAllocation.OrderByDescending(x => x).ToList();
+            meterUnitAllocation = meterUnitAllocation.OrderBy(x => x.Id).ToList();
             if(meterUnitAllocation.First().AllocatedUnits < meterUnitAllocation.First().ConsumedUnits){
                 engDiff = meterUnitAllocation.First().ConsumedUnits - meterUnitAllocation.First().AllocatedUnits;
                 meterUnitAllocation.First().ConsumedUnits -= engDiff;
                 meterUnitAllocation.First().unitAllocationStatus = UnitAllocationStatus.Inactive;
-                if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
+                if(DateTime.Today.AddHours(8) < DateTime.Now && DateTime.Today.AddHours(17) >= DateTime.Now){
+                    meterUnitAllocation.First().PeakLoad += powerInkWh - engDiff;
+                }else{
+                    meterUnitAllocation.First().OffPeakLoad += powerInkWh - engDiff;
+                }
+                await _meterUnitAllocationRepo.Update(meterUnitAllocation.First());
+                return (true, true, 0);
+            }
+            else if(meterUnitAllocation.First().AllocatedUnits > meterUnitAllocation.First().ConsumedUnits){
+                if(DateTime.Today.AddHours(8) < DateTime.Now && DateTime.Today.AddHours(17) >= DateTime.Now){
                     meterUnitAllocation.First().PeakLoad += powerInkWh - engDiff;
                 }else{
                     meterUnitAllocation.First().OffPeakLoad += powerInkWh - engDiff;
@@ -149,7 +164,7 @@ public class DataService : IDataService
             else if(meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1] != null && meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus == UnitAllocationStatus.Pending && meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].ConsumedUnits == 0){
                 meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].ConsumedUnits += engDiff;
                 meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus = UnitAllocationStatus.Active;
-                if(DateTime.Today.AddHours(8) < createMeterUnitsDto.TimeValue && DateTime.Today.AddHours(17) >= createMeterUnitsDto.TimeValue){
+                if(DateTime.Today.AddHours(8) < DateTime.Now && DateTime.Today.AddHours(17) >= DateTime.Now){
                     meterUnitAllocation.First().PeakLoad += engDiff;
                 }else{
                     meterUnitAllocation.First().OffPeakLoad += engDiff;
@@ -201,5 +216,30 @@ public class DataService : IDataService
                 }
             }
         }
+    }
+    public async Task<DashBoardResponse> GetDashBoardData()
+    {
+        var customers = await _cutomerService.GetAllCustomers();
+        var meters = await _meterService.GetAllMeters();
+        var meterUnits = await _meterUnitAllocationService.GetAllMeterUnitsAllocation();
+        if (customers != null || meters != null || meterUnits != null)
+        {
+            return new DashBoardResponse
+            {
+                dashboardDto = new DashBoardDto
+                {
+                    getCustomerDto = customers.Data.ToList(),
+                    getMeterDto = meters.Data.ToList(),
+                    getTransactionDto = meterUnits.Data.Select(x => x.GetTransactionDto).ToList()
+                },
+                Status = true
+            };
+        }
+        return new DashBoardResponse
+        {
+            dashboardDto = null,
+            Status = false,
+            Message = "Unable to fetch Dashboard Data!"
+        };
     }
 }

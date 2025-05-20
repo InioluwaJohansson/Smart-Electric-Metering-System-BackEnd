@@ -31,6 +31,7 @@ public class GetCustomerDto
     public string PictureUrl { get; set; }
     public List<GetMeterDto> getMeterDto { get; set; }
     public GetNotificationDto getNotificationDto { get; set; }
+    public DateTime CreatedOn { get; set; }
 }
 public class CustomerResponse : BaseResponse
 {

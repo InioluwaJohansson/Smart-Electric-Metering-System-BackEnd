@@ -152,7 +152,7 @@ public class CustomerService : ICustomerService
     }
     public async Task<GetCustomerDto> GetCustomerDetails(Customer customer)
     {
-        var meters = await _meterRepo.GetByExpression(x =>x.UserId == customer.User.Id);
+        var meters = await _meterRepo.GetByExpression(x => x.UserId == customer.User.Id);
         return new GetCustomerDto ()
         {
             Id = customer.Id,
@@ -163,6 +163,7 @@ public class CustomerService : ICustomerService
             Email = customer.User.Email,
             PhoneNumber = customer.User.PhoneNumber,
             PictureUrl = customer.User.PictureUrl,
+            CreatedOn = customer.CreatedOn,
             getMeterDto = meters.Select(x => new GetMeterDto{
                 Id = x.Id,
                 MeterId = x.MeterId,

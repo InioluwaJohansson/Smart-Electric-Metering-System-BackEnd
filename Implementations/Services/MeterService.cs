@@ -10,9 +10,11 @@ public class MeterService : IMeterService
 {
     IMeterRepo _meterRepo;
     IUserRepo _userRepo;
-    public MeterService(IMeterRepo meterRepo, IUserRepo userRepo)
+    IMeterUnitsRepo _meterUnitsRepo;
+    public MeterService(IMeterRepo meterRepo, IMeterUnitsRepo meterUnitsRepo, IUserRepo userRepo)
     {
         _meterRepo = meterRepo;
+        _meterUnitsRepo = meterUnitsRepo;
         _userRepo = userRepo;
     }
     public async Task<BaseResponse> CreateMeter(CreateMeterDto createMeterDto)
@@ -213,6 +215,35 @@ public class MeterService : IMeterService
             Message = "No Meters Found!"
         };
     }
+    public async Task<MeterUnitsResponse> GetAllMeterUnits()
+    {
+        var meters = await _meterUnitsRepo.GetAll();
+        if (meters != null)
+        {
+            return new MeterUnitsResponse
+            {
+                Status = true,
+                Message = "Meters Found!",
+                Data = meters.Select(x => new GetMeterUnitsDto
+                {
+                    Id = x.Id,
+                    MeterId = x.MeterId,
+                    PowerValue = x.PowerValue,
+                    VoltageValue = x.VoltageValue,
+                    CurrentValue = x.CurrentValue,
+                    PowerFactorValue = x.PowerFactorValue,
+                    ConsumptionValue = x.ConsumptionValue,
+                    ElectricityCost = x.ElectricityCost,
+                    TimeValue = x.TimeValue
+                }).ToList(),
+            };
+        }
+        return new MeterUnitsResponse
+        {
+            Status = false,
+            Message = "No Meter Units!"
+        };
+    }
     public async Task<GetMeterDto> GetMeterDto(Meter meter)
     {
         var getuser = await _userRepo.Get(x => x.Id == meter.UserId);
@@ -269,6 +300,7 @@ public class MeterService : IMeterService
             }).ToList(),
             IsActive = meter.IsActive,
             ActiveLoad = meter.ActiveLoad,
+            DateCreated = meter.CreatedOn,
         };
     }
 }
