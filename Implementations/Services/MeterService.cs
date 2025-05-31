@@ -283,7 +283,7 @@ public class MeterService : IMeterService
                     Rate = x.Transaction.Rate,
                     BaseCharge = x.Transaction.BaseCharge,
                     Taxes = x.Transaction.Taxes,
-                    Total = x.Transaction.Taxes
+                    Total = x.Transaction.Total
                 },
             }).ToList(),
             GetMeterUnitsDto = meter.MeterUnits.Select(x => new GetMeterUnitsDto

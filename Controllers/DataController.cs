@@ -55,5 +55,15 @@ namespace Smart_Metering_System_BackEnd.Controllers
             }
             return Ok(data);
         }
+        [HttpGet("GetDashBoardTransactionData")]
+        public async Task<IActionResult> GetDashBoardTransactionData()
+        {
+            var data = await _dataService.GetTransactionPerCustomer();
+            if (data.Status == true)
+            {
+                return Ok(data);
+            }
+            return Ok(data);
+        }
     }
 }

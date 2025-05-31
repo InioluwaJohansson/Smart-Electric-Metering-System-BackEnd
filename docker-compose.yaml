@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    image: smartelectricmeteringsystembackend:dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7211:80"       # Change as needed
+      - "5191:443"      # Change as needed
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db;Database=mydb;User=root;Password=pass;
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: mydb
+      MYSQL_ROOT_PASSWORD: pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:

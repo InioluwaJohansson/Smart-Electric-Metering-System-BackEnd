@@ -242,4 +242,47 @@ public class DataService : IDataService
             Message = "Unable to fetch Dashboard Data!"
         };
     }
+    public async Task<GetTransactionPerCustomerResponse> GetTransactionPerCustomer()
+    {
+        var customers = await _cutomerService.GetAllCustomers();
+        var transactions = new List<GetTransactionPerCustomer>();
+        if(customers != null)
+        {
+            foreach (var customer in customers.Data)
+            {
+                var meters = await _meterRepo.GetMeterByUserId(customer.Id);
+                if (meters != null)
+                {
+                    foreach (var meter in meters)
+                    {
+                        transactions.Add(new GetTransactionPerCustomer
+                        {
+                            CustomerName = customer.FirstName + " " + customer.LastName,
+                            getTransactionDto = meter.MeterUnitAllocation.Select(x => new GetTransactionDto
+                            {
+                                TransactionId = x.Transaction.TransactionId,
+                                Date = x.Transaction.Date,
+                                Time = x.Transaction.Time,
+                                Rate = x.Transaction.Rate,
+                                BaseCharge = x.Transaction.BaseCharge,
+                                Taxes = x.Transaction.Taxes,
+                                Total = x.Transaction.Total
+                            }).ToList()
+                        });
+                    }
+                }
+            }
+            return new GetTransactionPerCustomerResponse
+            {
+                Data = transactions,
+                Status = true
+            };
+        }
+        return new GetTransactionPerCustomerResponse
+        {
+            Data = null,
+            Status = false,
+            Message = "Unable to fetch Transactions per Customer!"
+        };
+    }
 }
