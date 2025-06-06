@@ -52,7 +52,7 @@ public class DataService : IDataService
     public async Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto){
         var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId && x.ConnectionAuth == createMeterUnitsDto.ConnectionAuth);
         if(meter != null && meter.TotalUnits > meter.ConsumedUnits){
-            var powerInkWh = createMeterUnitsDto.PowerValue * 0.001 / 360;
+            var powerInkWh = createMeterUnitsDto.PowerValue;
             var meterUnitAllocationResolve = await ResolveUnitAllocation(meter.Id, powerInkWh, createMeterUnitsDto);
             if(meterUnitAllocationResolve.Item1 == true && meterUnitAllocationResolve.Item2 == true && meterUnitAllocationResolve.Item3 == 0){
                 meter.ConsumedUnits += powerInkWh;
