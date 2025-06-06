@@ -35,12 +35,15 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped<IMeterPromptService, MeterPromptService>();
 builder.Services.AddScoped<IPricesService, PricesService>();
-builder.Services.AddHostedService<BackgroundServices>();
 builder.Services.AddHttpContextAccessor();
 var connectionString = builder.Configuration.GetConnectionString("SmartElectricMeteringContext");
 builder.Services.AddDbContext<SmartElectricMeteringContext>(x => x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))); 
+
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddHostedService<BackgroundServices>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(x =>
 {
@@ -81,7 +84,16 @@ builder.Services.AddAuthentication(x =>
 });
 
 var app = builder.Build();
-
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<SmartElectricMeteringContext>();
+    if(db.Database.GetPendingMigrations().Any())
+        // if (db.Database.GetPendingMigrations().Count() > 0)
+    {
+        //db.Database.EnsureCreated();
+    db.Database.Migrate();
+    }
+}
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsProduction())
 // {
@@ -103,3 +115,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+// server=localhost;user=root;database=SmartElectricMeteringSystem;password=Inioluwa10%

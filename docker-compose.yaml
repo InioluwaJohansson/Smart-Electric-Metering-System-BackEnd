@@ -1,30 +1,38 @@
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
-    image: smartelectricmeteringsystembackend:dev
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "7211:80"       # Change as needed
-      - "5191:443"      # Change as needed
+    build: ../Smart Metering System BackEnd
+    networks:
+      - app-network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    ports:
+      - "7211:7211"
+      - "5191:5191"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=db;Database=mydb;User=root;Password=pass;
+      - ConnectionStrings__Default=server=db;Port=3306;user=root;password=Inioluwa10%;database=SmartElectricMeteringSystem
 
   db:
     image: mysql:8.0
-    restart: always
-    environment:
-      MYSQL_DATABASE: mydb
-      MYSQL_ROOT_PASSWORD: pass
+    networks:
+      - app-network
     ports:
-      - "3306:3306"
+      - "3308:3306"
+    environment:
+      MYSQL_DATABASE: SmartElectricMeteringSystem
+      MYSQL_ROOT_PASSWORD: Inioluwa10%
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pInioluwa10%"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
     volumes:
       - dbdata:/var/lib/mysql
 
 volumes:
   dbdata:
+
+networks:
+  app-network:
