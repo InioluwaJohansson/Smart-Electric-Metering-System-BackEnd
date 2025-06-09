@@ -9,16 +9,15 @@ public class DashBoardDto
     public List<GetTransactionDto> getTransactionDto { get; set; }
     public List<GetMeterDto> getMeterDto { get; set; }
     public List<GetCustomerDto> getCustomerDto { get; set; }
-    public List<GetTransactionPerCustomer> getTransactionsPerCustomers { get; set; }
 }
-public class GetTransactionPerCustomer
+public class GetAllTransactionPerCustomer
 {
     public string CustomerName { get; set; }
     public List<GetTransactionDto> getTransactionDto { get; set; }
 }
-public class GetTransactionPerCustomerResponse : BaseResponse
+public class GetAllTransactionResponse : BaseResponse
 {
-    public ICollection<GetTransactionPerCustomer> Data { get; set; } = new HashSet<GetTransactionPerCustomer>();
+    public ICollection<GetTransactionDto> Data { get; set; } = new HashSet<GetTransactionDto>();
 }
 public class DashBoardResponse : BaseResponse
 {
