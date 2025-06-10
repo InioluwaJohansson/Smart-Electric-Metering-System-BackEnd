@@ -100,6 +100,11 @@ using (var scope = app.Services.CreateScope())
 //     app.UseSwagger();
 //     app.UseSwaggerUI();
 // }
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"➡️ Incoming Request: {context.Request.Method} {context.Request.Path}");
+    await next.Invoke();
+});
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpsRedirection();
