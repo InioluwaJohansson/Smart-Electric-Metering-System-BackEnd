@@ -52,8 +52,8 @@ public class DataService : IDataService
     public async Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto){
         var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId && x.ConnectionAuth == createMeterUnitsDto.ConnectionAuth);
         if(meter != null && meter.TotalUnits > meter.ConsumedUnits){
-            var powerInkWh = createMeterUnitsDto.PowerValue * 0.001 / 360;
-            var meterUnitAllocationResolve = await ResolveUnitAllocation(meter.Id, powerInkWh, createMeterUnitsDto);
+            var powerInkWh = createMeterUnitsDto.PowerValue;
+            var meterUnitAllocationResolve = await ResolveUnitAllocation(meter.Id, powerInkWh);
             if(meterUnitAllocationResolve.Item1 == true && meterUnitAllocationResolve.Item2 == true && meterUnitAllocationResolve.Item3 == 0){
                 meter.ConsumedUnits += powerInkWh;
             }
@@ -83,7 +83,7 @@ public class DataService : IDataService
                     MeterId = meter.MeterId,
                     ConnectionAuth = meter.ConnectionAuth,
                     Title = "High Voltage Warning",
-                    Description = $"The meter recorded voltages above the maximum operating limit. The meter will reconnect momentarily.",
+                    Description = $"The meter {meter.MeterId} recorded voltages above the maximum operating limit. The meter will reconnect momentarily.",
                     Type = MeterPromptType.VoltageOverload
                 };
                 await _meterPromptService.CreateMeterPrompt(meterPrompt);
@@ -133,7 +133,7 @@ public class DataService : IDataService
             Message = "Unable to fetch Meter Units!"
         };
     }
-    public async Task<(bool,bool, double)> ResolveUnitAllocation(int meterId, double powerInkWh, CreateMeterUnitsDto createMeterUnitsDto)
+    public async Task<(bool,bool, double)> ResolveUnitAllocation(int meterId, double powerInkWh)
     {
         var meterUnitAllocation = await _meterUnitAllocationRepo.GetByExpression(x => x.MeterId == meterId && (x.unitAllocationStatus == UnitAllocationStatus.Active || x.unitAllocationStatus == UnitAllocationStatus.Pending));
         var meter = await _meterRepo.Get(x => x.Id == meterId);
@@ -153,6 +153,8 @@ public class DataService : IDataService
                 return (true, true, 0);
             }
             else if(meterUnitAllocation.First().AllocatedUnits > meterUnitAllocation.First().ConsumedUnits){
+                meterUnitAllocation.First().unitAllocationStatus = UnitAllocationStatus.Active;
+                meterUnitAllocation.First().ConsumedUnits += powerInkWh - engDiff;
                 if(DateTime.Today.AddHours(8) < DateTime.Now && DateTime.Today.AddHours(17) >= DateTime.Now){
                     meterUnitAllocation.First().PeakLoad += powerInkWh - engDiff;
                 }else{
@@ -165,9 +167,10 @@ public class DataService : IDataService
                 meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].ConsumedUnits += engDiff;
                 meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus = UnitAllocationStatus.Active;
                 if(DateTime.Today.AddHours(8) < DateTime.Now && DateTime.Today.AddHours(17) >= DateTime.Now){
-                    meterUnitAllocation.First().PeakLoad += engDiff;
+                    meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].PeakLoad += engDiff;
+                    meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].unitAllocationStatus = UnitAllocationStatus.Active;
                 }else{
-                    meterUnitAllocation.First().OffPeakLoad += engDiff;
+                    meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1].OffPeakLoad += engDiff;
                 }
                 await _meterUnitAllocationRepo.Update(meterUnitAllocation.First());
                 await _meterUnitAllocationRepo.Update(meterUnitAllocation[meterUnitAllocation.IndexOf(meterUnitAllocation.First()) + 1]);
@@ -180,8 +183,8 @@ public class DataService : IDataService
     }
     public async Task<bool> CheckUnitsLeftSendPrompt(IList<MeterUnitAllocation> meterUnitAllocations, string meterId, string connectionAuth){
         if(meterUnitAllocations.Count() == 1){
-            if(meterUnitAllocations.First().ConsumedUnits / meterUnitAllocations.First().AllocatedUnits * 100 < 30){
-                var units = meterUnitAllocations.First().AllocatedUnits - meterUnitAllocations.First().ConsumedUnits;
+            if(meterUnitAllocations.Last().ConsumedUnits / meterUnitAllocations.Last().AllocatedUnits * 100 < 30){
+                var units = meterUnitAllocations.Last().AllocatedUnits - meterUnitAllocations.Last().ConsumedUnits;
                 var meterPrompt = new CreateMeterPromptDto{
                     MeterId = meterId,
                     ConnectionAuth = connectionAuth,
