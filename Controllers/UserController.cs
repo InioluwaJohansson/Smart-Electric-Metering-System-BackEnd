@@ -11,11 +11,11 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class UserController : ControllerBase
     {
         IUserService _userService;
-        //IJWTAuthentication _auth;, IJWTAuthentication auth
-        public UserController(IUserService userService)
+        IJWTAuthentication _auth;
+        public UserController(IUserService userService, IJWTAuthentication auth)
         {
             _userService = userService;
-            //_auth = auth;
+            _auth = auth;
         }
         [HttpGet("CheckUserName")]
         public async Task<IActionResult> CheckUserName(string username)
@@ -33,8 +33,8 @@ namespace Smart_Metering_System_BackEnd.Controllers
             var user = await _userService.Login(username, password);
             if (user.Status == true)
             {
-                //var token = _auth.GenerateToken(user.Data);
-                //user.Token = token;
+                var token = _auth.GenerateToken(user.Data);
+                user.Token = token;
                 return Ok(user);
             }
             return Ok(user);

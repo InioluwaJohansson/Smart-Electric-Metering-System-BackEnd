@@ -64,8 +64,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = false;
 });
 
-var key = "Auth Key";
-builder.Services.AddSingleton<JWTAuthentication>(new JWTAuthentication(key));
+var key = "Authentication Key For Smart Electric Metering System";
+builder.Services.AddSingleton<IJWTAuthentication>( new JWTAuthentication(key));
 
 builder.Services.AddAuthentication(x =>
 {
