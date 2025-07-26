@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 7211
-EXPOSE 5191
+#EXPOSE 5191
 
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
@@ -28,4 +28,4 @@ COPY --from=publish /app/publish ./
 
 # Automatically apply EF Core migrations on container start
 # Assumes you have Database.Migrate() in Program.cs
-ENTRYPOINT ["dotnet", "Smart Electric Metering System BackEnd.dll"]
+CMD ["/bin/sh", "-c", "sleep 420 && dotnet 'Smart Electric Metering System BackEnd.dll'"]
