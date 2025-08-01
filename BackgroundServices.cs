@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Smart_Electric_Metering_System_BackEnd.Context;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Repositories;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Services;

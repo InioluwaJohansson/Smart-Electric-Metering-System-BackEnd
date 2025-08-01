@@ -24,7 +24,7 @@ public class MeterService : IMeterService
             var meter = new Meter()
             {
                 IsActive = false,
-                ActiveLoad = false,
+                ActiveLoad = createMeterDto.IsActive,
                 CreatedBy = createMeterDto.AdminUserId,
                 LastModifiedBy = createMeterDto.AdminUserId,
                 MeterKey = Guid.NewGuid().ToString().Substring(0,12).Replace("-", "").ToUpper(),
@@ -55,7 +55,7 @@ public class MeterService : IMeterService
     public async Task<BaseResponse> AttachMeterToCustomer(AttachMeterDto attachMeterDto)
     {
         var user = await _userRepo.Get(x => x.Id == attachMeterDto.UserId);
-        if (user != null)
+        if (user != null )
         {
             var meter = await _meterRepo.Get(x => x.MeterId == attachMeterDto.MeterId && x.MeterKey == attachMeterDto.MeterKey);
             if (meter != null && meter.UserId == 0)
@@ -283,7 +283,7 @@ public class MeterService : IMeterService
                     Rate = x.Transaction.Rate,
                     BaseCharge = x.Transaction.BaseCharge,
                     Taxes = x.Transaction.Taxes,
-                    Total = x.Transaction.Taxes
+                    Total = x.Transaction.Total
                 },
             }).ToList(),
             GetMeterUnitsDto = meter.MeterUnits.Select(x => new GetMeterUnitsDto

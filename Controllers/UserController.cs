@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Smart_Electric_Metering_System_BackEnd.Interfaces.Services;
 using Smart_Electric_Metering_System_BackEnd.Models.DTOs;
+using Smart_Electric_Metering_System_BackEnd.Authentication;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Smart_Metering_System_BackEnd.Controllers
@@ -10,9 +11,11 @@ namespace Smart_Metering_System_BackEnd.Controllers
     public class UserController : ControllerBase
     {
         IUserService _userService;
-        public UserController(IUserService userService)
+        IJWTAuthentication _auth;
+        public UserController(IUserService userService, IJWTAuthentication auth)
         {
             _userService = userService;
+            _auth = auth;
         }
         [HttpGet("CheckUserName")]
         public async Task<IActionResult> CheckUserName(string username)
@@ -30,6 +33,8 @@ namespace Smart_Metering_System_BackEnd.Controllers
             var user = await _userService.Login(username, password);
             if (user.Status == true)
             {
+                var token = _auth.GenerateToken(user.Data);
+                user.Token = token;
                 return Ok(user);
             }
             return Ok(user);

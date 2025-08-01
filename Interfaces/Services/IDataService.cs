@@ -9,4 +9,5 @@ public interface IDataService
     public Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto);
     public Task CheckConnection();
     public Task<DashBoardResponse> GetDashBoardData();
+    public Task<GetAllTransactionResponse> GetAllTransactions();
 }

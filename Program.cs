@@ -35,12 +35,15 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDataService, DataService>();
 builder.Services.AddScoped<IMeterPromptService, MeterPromptService>();
 builder.Services.AddScoped<IPricesService, PricesService>();
-builder.Services.AddHostedService<BackgroundServices>();
 builder.Services.AddHttpContextAccessor();
 var connectionString = builder.Configuration.GetConnectionString("SmartElectricMeteringContext");
 builder.Services.AddDbContext<SmartElectricMeteringContext>(x => x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))); 
+
+
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddHostedService<BackgroundServices>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(x =>
 {
@@ -61,8 +64,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = false;
 });
 
-var key = "Auth Key";
-builder.Services.AddSingleton<JWTAuthentication>(new JWTAuthentication(key));
+var key = "Authentication Key For Smart Electric Metering System";
+builder.Services.AddSingleton<IJWTAuthentication>( new JWTAuthentication(key));
 
 builder.Services.AddAuthentication(x =>
 {
@@ -81,14 +84,29 @@ builder.Services.AddAuthentication(x =>
 });
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var db = scope.ServiceProvider.GetRequiredService<SmartElectricMeteringContext>();
+    if(db.Database.GetPendingMigrations().Any())
+        // if (db.Database.GetPendingMigrations().Count() > 0)
+    {
+        //db.Database.EnsureCreated();
+    db.Database.Migrate();
+    }
 }
-
+// Configure the HTTP request pipeline.
+// if (app.Environment.IsProduction())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI();
+// }
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"➡️ Incoming Request: {context.Request.Method} {context.Request.Path}");
+    await next.Invoke();
+});
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
@@ -102,3 +120,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+// server=localhost;user=root;database=SmartElectricMeteringSystem;password=Inioluwa10%
