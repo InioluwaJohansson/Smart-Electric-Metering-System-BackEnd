@@ -1,7 +1,7 @@
 # Base image for running the app
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
-EXPOSE 7211
+EXPOSE 7221
 #EXPOSE 5191
 
 # Build stage
@@ -28,4 +28,4 @@ COPY --from=publish /app/publish ./
 
 # Automatically apply EF Core migrations on container start
 # Assumes you have Database.Migrate() in Program.cs
-CMD ["/bin/sh", "-c", "sleep 420 && dotnet 'Smart Electric Metering System BackEnd.dll'"]
+ENTRYPOINT ["dotnet", "Smart Electric Metering System BackEnd.dll"]

@@ -37,9 +37,13 @@ builder.Services.AddScoped<IMeterPromptService, MeterPromptService>();
 builder.Services.AddScoped<IPricesService, PricesService>();
 builder.Services.AddHttpContextAccessor();
 var connectionString = builder.Configuration.GetConnectionString("SmartElectricMeteringContext");
-builder.Services.AddDbContext<SmartElectricMeteringContext>(x => x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))); 
-
-
+// connectionString = $"Server={Environment.GetEnvironmentVariable("MYSQLHOST")};" +
+//                        $"Port={Environment.GetEnvironmentVariable("MYSQLPORT")};" +
+//                        $"Database={Environment.GetEnvironmentVariable("MYSQLDATABASE")};" +
+//                        $"User={Environment.GetEnvironmentVariable("MYSQLUSER")};" +
+//                        $"Password={Environment.GetEnvironmentVariable("MYSQLPASSWORD")};";
+Console.WriteLine($"Connection String: {connectionString}");
+builder.Services.AddDbContext<SmartElectricMeteringContext>(x => x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
