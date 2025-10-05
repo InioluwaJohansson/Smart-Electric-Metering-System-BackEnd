@@ -28,4 +28,4 @@ COPY --from=publish /app/publish ./
 
 # Automatically apply EF Core migrations on container start
 # Assumes you have Database.Migrate() in Program.cs
-ENTRYPOINT ["dotnet", "Smart Electric Metering System BackEnd.dll"]
+ENTRYPOINT ["dotnet", "SmartElectricMeteringSystemBackEnd.dll"]
