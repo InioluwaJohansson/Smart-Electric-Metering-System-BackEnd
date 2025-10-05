@@ -51,7 +51,6 @@ public class DataService : IDataService
     }
     public async Task<BaseResponse> MeterUnitsDataFromESP32(CreateMeterUnitsDto createMeterUnitsDto){
         var meter = await _meterRepo.Get(x => x.MeterId == createMeterUnitsDto.MeterId && x.ConnectionAuth == createMeterUnitsDto.ConnectionAuth);
-<<<<<< New-Main
         if(meter != null && meter.IsActive == true && meter.TotalUnits > meter.ConsumedUnits){
             var powerInkWh = createMeterUnitsDto.PowerValue;
             var meterUnitAllocationResolve = await ResolveUnitAllocation(meter.Id, powerInkWh);
