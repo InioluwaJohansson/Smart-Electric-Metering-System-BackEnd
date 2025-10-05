@@ -1,0 +1,8 @@
+build:
+  languages:
+    - dotnet
+  script:
+    - dotnet publish -c Release -o out
+release:
+  command:
+    - dotnet out/SmartElectricMeteringSystemBackEnd.dll
