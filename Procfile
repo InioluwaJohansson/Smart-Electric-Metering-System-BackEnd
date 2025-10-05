@@ -1,1 +1,1 @@
-web: dotnet Smart Electric Metering System BackEnd.dll
+web: dotnet SmartElectricMeteringSystemBackEnd.dll
