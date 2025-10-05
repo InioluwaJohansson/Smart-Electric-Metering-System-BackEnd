@@ -37,6 +37,7 @@ builder.Services.AddScoped<IMeterPromptService, MeterPromptService>();
 builder.Services.AddScoped<IPricesService, PricesService>();
 builder.Services.AddHttpContextAccessor();
 var connectionString = builder.Configuration.GetConnectionString("SmartElectricMeteringContext");
+connectionString = "server=shinkansen.proxy.rlwy.net;port=57900;user=root;password=fqfQBNnFmMJXFwAXCwELBxvujDELiJlm;database=railway;protocol=TCP";
 // connectionString = $"Server={Environment.GetEnvironmentVariable("MYSQLHOST")};" +
 //                        $"Port={Environment.GetEnvironmentVariable("MYSQLPORT")};" +
 //                        $"Database={Environment.GetEnvironmentVariable("MYSQLDATABASE")};" +
