@@ -1,1 +1,1 @@
-web: dotnet SmartElectricMeteringSystemBackEnd.dll
+web: dotnet publish/SmartElectricMeteringSystemBackEnd.dll
